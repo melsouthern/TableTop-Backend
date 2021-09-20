@@ -1,5 +1,9 @@
 const db = require("../connection");
 const format = require("pg-format");
+const {
+  formatCategoryDataToNested,
+  formatUserDataToNested,
+} = require("../utils/data-manipulation");
 
 const seed = async (data) => {
   const { categoryData, commentData, reviewData, userData } = data;
@@ -46,7 +50,27 @@ const seed = async (data) => {
     body VARCHAR(200) NOT NULL
   );`);
 
-  console.log(categoryData);
+  const formattedCategoryData = await formatCategoryDataToNested(categoryData);
+  const categoryQuery = await format(
+    `INSERT INTO categories
+    (slug, description)
+    VALUES
+    %L;`,
+    formattedCategoryData
+  );
+  await db.query(categoryQuery);
+
+  const formattedUserData = await formatUserDataToNested(userData);
+  let userQuery = await format(
+    `INSERT INTO users
+    (username, avatar_url, name)
+    VALUES
+    %L;`,
+    formattedUserData
+  );
+  await db.query(userQuery);
+  console.log(formattedUserData);
+
   // 1. create tables
   // 2. insert data
 };
