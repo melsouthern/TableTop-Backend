@@ -14,24 +14,31 @@ exports.formatUserDataToNested = (userData) => {
   return formattedUserData;
 };
 
-// exports.formatToNested = (data) => {
-//   const dataProperties = [];
-//   const innerArray = [];
-//   const outerArray = [];
+exports.formatReviewDataToNested = (reviewData) => {
+  const formattedReviewData = reviewData.map((review) => {
+    return [
+      review.title,
+      review.review_body,
+      review.designer,
+      review.review_img_url,
+      review.votes,
+      review.category,
+      review.owner,
+      review.created_at,
+    ];
+  });
+  return formattedReviewData;
+};
 
-//   for (const propName in data[0]) {
-//     dataProperties.push(propName);
-//   }
-//   console.log(dataProperties);
-
-//   for (let i = 0; i < data.length; i++) {
-//     for (let j = 0; j < dataProperties.length; j++) {
-//       if (data[i] !== undefined) {
-//         innerArray.push(data[i][dataProperties[j]]);
-//       }
-//     }
-//     outerArray.push(innerArray);
-//   }
-
-//   console.log(outerArray);
-// };
+exports.formatCommentDataToNested = (commentData) => {
+  const formattedCommentData = commentData.map((comment) => {
+    return [
+      comment.author,
+      comment.review_id,
+      comment.votes,
+      comment.created_at,
+      comment.body,
+    ];
+  });
+  return formattedCommentData;
+};

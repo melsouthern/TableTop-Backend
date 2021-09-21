@@ -3,6 +3,8 @@ const format = require("pg-format");
 const {
   formatCategoryDataToNested,
   formatUserDataToNested,
+  formatReviewDataToNested,
+  formatCommentDataToNested,
 } = require("../utils/data-manipulation");
 
 const seed = async (data) => {
@@ -47,7 +49,7 @@ const seed = async (data) => {
     review_id INT REFERENCES reviews(review_id),
     votes INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    body VARCHAR(200) NOT NULL
+    body VARCHAR(500) NOT NULL
   );`);
 
   const formattedCategoryData = await formatCategoryDataToNested(categoryData);
@@ -61,7 +63,7 @@ const seed = async (data) => {
   await db.query(categoryQuery);
 
   const formattedUserData = await formatUserDataToNested(userData);
-  let userQuery = await format(
+  const userQuery = await format(
     `INSERT INTO users
     (username, avatar_url, name)
     VALUES
@@ -69,7 +71,26 @@ const seed = async (data) => {
     formattedUserData
   );
   await db.query(userQuery);
-  console.log(formattedUserData);
+
+  const formattedReviewData = await formatReviewDataToNested(reviewData);
+  const reviewQuery = await format(
+    `INSERT INTO reviews
+    (title, review_body, designer, review_img_url, votes, category, owner, created_at)
+    VALUES
+    %L;`,
+    formattedReviewData
+  );
+  await db.query(reviewQuery);
+
+  const formattedCommentData = await formatCommentDataToNested(commentData);
+  const commentQuery = await format(
+    `INSERT INTO comments
+  (author, review_id, votes, created_at, body)
+  VALUES
+  %L;`,
+    formattedCommentData
+  );
+  await db.query(commentQuery);
 
   // 1. create tables
   // 2. insert data
