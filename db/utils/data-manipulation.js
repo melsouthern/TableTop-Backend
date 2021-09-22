@@ -1,4 +1,5 @@
 // extract any functions you are using to manipulate your data, into this file
+const db = require("../connection");
 
 exports.formatCategoryDataToNested = (categoryData) => {
   const formattedCategoryData = categoryData.map((category) => {
@@ -41,4 +42,20 @@ exports.formatCommentDataToNested = (commentData) => {
     ];
   });
   return formattedCommentData;
+};
+
+exports.checkReviewIdExists = async (review_id) => {
+  const result = await db.query("SELECT * FROM reviews WHERE review_id = $1;", [
+    review_id,
+  ]);
+  if (result.rows.length === 0) {
+    return false;
+  } else {
+    return true;
+  }
+};
+
+exports.checkReviewIdDataType = (review_id) => {
+  const regex = /^\d+$/;
+  return regex.test(review_id);
 };

@@ -14,8 +14,4 @@ apiRouter.use("/reviews", reviewsRouter);
 apiRouter.use("/comments", commentsRouter);
 apiRouter.use("/users", usersRouter);
 
-apiRouter.all("*", (req, res) => {
-  res.status(404).send({ msg: "Invalid URL" });
-});
-
 module.exports = apiRouter;

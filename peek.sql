@@ -1,4 +1,4 @@
-\c nc_games
+\c nc_games_test
 
 SELECT * FROM categories;
 SELECT * FROM users;

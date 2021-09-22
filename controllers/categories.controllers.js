@@ -6,6 +6,5 @@ exports.getCategories = async (req, res, next) => {
     res.status(200).send({ categories: result });
   } catch (err) {
     next(err);
-    console.log(err);
   }
 };
