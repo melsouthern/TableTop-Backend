@@ -37,20 +37,22 @@ describe("GET /api/categories", () => {
 describe("GET /api/reviews/:review_id", () => {
   test("200: responds with the review object for the relevant review_id provided", async () => {
     const result = await request(app).get("/api/reviews/10").expect(200);
-    expect(result.body.review).toMatchObject({
-      review_id: 10,
-      title: "Build you own tour de Yorkshire",
-      review_body:
-        "Cold rain pours on the faces of your team of cyclists, you pulled to the front of the pack early and now your taking on exhaustion cards like there is not tomorrow, you think there are about 2 hands left until you cross the finish line, will you draw enough from your deck to cross before the other team shoot passed? Flamee Rouge is a Racing deck management game where you carefully manage your deck in order to cross the line before your opponents, cyclist can fall slyly behind front runners in their slipstreams to save precious energy for the prefect moment to burst into the lead ",
-      designer: "Asger Harding Granerud",
-      review_img_url:
-        "https://images.pexels.com/photos/258045/pexels-photo-258045.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
-      votes: 10,
-      category: "social deduction",
-      owner: "mallionaire",
-      created_at: "2021-01-18T10:01:41.251Z",
-      comment_count: "0",
-    });
+    expect(result.body.review).toEqual([
+      {
+        review_id: 10,
+        title: "Build you own tour de Yorkshire",
+        review_body:
+          "Cold rain pours on the faces of your team of cyclists, you pulled to the front of the pack early and now your taking on exhaustion cards like there is not tomorrow, you think there are about 2 hands left until you cross the finish line, will you draw enough from your deck to cross before the other team shoot passed? Flamee Rouge is a Racing deck management game where you carefully manage your deck in order to cross the line before your opponents, cyclist can fall slyly behind front runners in their slipstreams to save precious energy for the prefect moment to burst into the lead ",
+        designer: "Asger Harding Granerud",
+        review_img_url:
+          "https://images.pexels.com/photos/258045/pexels-photo-258045.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
+        votes: 10,
+        category: "social deduction",
+        owner: "mallionaire",
+        created_at: "2021-01-18T10:01:41.251Z",
+        comment_count: "0",
+      },
+    ]);
   });
   test("404: responds with error message if reviews spelled incorrectly", async () => {
     const result = await request(app).get("/api/reeviews/10").expect(404);
@@ -76,36 +78,38 @@ describe("PATCH /api/reviews/:review_id", () => {
       .patch("/api/reviews/3")
       .send({ inc_votes: 3 })
       .expect(200);
-    expect(result.body.review).toMatchObject({
-      review_id: 3,
-      title: "Ultimate Werewolf",
-      review_body: "We couldn't find the werewolf!",
-      designer: "Akihisa Okui",
-      review_img_url:
-        "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
-      votes: 8,
-      category: "social deduction",
-      owner: "bainesface",
-      created_at: "2021-01-18T10:01:41.251Z",
-      comment_count: "3",
-    });
+    expect(result.body.review).toEqual([
+      {
+        review_id: 3,
+        title: "Ultimate Werewolf",
+        review_body: "We couldn't find the werewolf!",
+        designer: "Akihisa Okui",
+        review_img_url:
+          "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+        votes: 8,
+        category: "social deduction",
+        owner: "bainesface",
+        created_at: "2021-01-18T10:01:41.251Z",
+      },
+    ]);
     const result1 = await request(app)
       .patch("/api/reviews/3")
       .send({ inc_votes: -10 })
       .expect(200);
-    expect(result1.body.review).toMatchObject({
-      review_id: 3,
-      title: "Ultimate Werewolf",
-      review_body: "We couldn't find the werewolf!",
-      designer: "Akihisa Okui",
-      review_img_url:
-        "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
-      votes: -5,
-      category: "social deduction",
-      owner: "bainesface",
-      created_at: "2021-01-18T10:01:41.251Z",
-      comment_count: "3",
-    });
+    expect(result1.body.review).toEqual([
+      {
+        review_id: 3,
+        title: "Ultimate Werewolf",
+        review_body: "We couldn't find the werewolf!",
+        designer: "Akihisa Okui",
+        review_img_url:
+          "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+        votes: -2,
+        category: "social deduction",
+        owner: "bainesface",
+        created_at: "2021-01-18T10:01:41.251Z",
+      },
+    ]);
   });
   test("404: responds with error message if reviews spelled incorrectly", async () => {
     const result = await request(app)
@@ -146,3 +150,50 @@ describe("PATCH /api/reviews/:review_id", () => {
     expect(result.body.msg).toBe("Bad Request");
   });
 });
+
+describe("GET /api/reviews", () => {
+  test("200: responds with an array of reviews objects", async () => {
+    const result = await request(app).get("/api/reviews").expect(200);
+    result.body.reviews.forEach((review) => {
+      expect(review).toMatchObject({
+        review_id: expect.any(Number),
+        title: expect.any(String),
+        review_img_url: expect.any(String),
+        votes: expect.any(Number),
+        category: expect.any(String),
+        owner: expect.any(String),
+        created_at: expect.any(String),
+        comment_count: expect.any(String),
+      });
+    });
+  });
+  test("404: responds with error message if reviews spelled incorrectly", async () => {
+    const result = await request(app).get("/api/revieews").expect(404);
+    expect(result.body.msg).toBe("Invalid URL");
+  });
+  test("404: responds with error message if api spelled incorrectly", async () => {
+    const result = await request(app).get("/aip/reviews").expect(404);
+    expect(result.body.msg).toBe("Invalid URL");
+  });
+  test("200: should accept sort_by query and sort reviews by column defined", async () => {
+    const result = await request(app)
+      .get("/api/reviews?sort_by=owner")
+      .expect(200);
+  });
+});
+
+//api/reviews?sort_by=owner
+//api/reviews?sort_by=title
+//api/reviews?sort_by=review_id
+//api/reviews?sort_by=category
+//api/reviews?sort_by=review_img_url
+//api/reviews?sort_by=created_at
+//api/reviews?sort_by=votes
+//api/reviews?sort_by=comment_count
+//api/reviews?sort_by (defaults to date)
+//api/reviews?order=asc
+//api/reviews?order=desc
+//api/reviews?order (defaults to desc)
+//api/reviews?category='social deduction'
+//api/reviews?category='euro game'
+//api/reviews?category (throw err)

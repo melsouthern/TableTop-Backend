@@ -13,17 +13,11 @@ exports.fetchSpecificReview = async (review_id) => {
   const checkedId = await checkReviewIdExists(review_id);
   if (checkedId) {
     const result = await db.query(
-      "SELECT * FROM reviews WHERE review_id = $1;",
+      `SELECT reviews.*, COUNT(comments.review_id) AS comment_count FROM reviews LEFT JOIN comments ON comments.review_id = reviews.review_id WHERE reviews.review_id = $1 GROUP BY reviews.review_id;`,
       [review_id]
     );
 
-    const commentCount = await db.query(
-      "SELECT COUNT(review_id) FROM comments WHERE review_id = $1;",
-      [review_id]
-    );
-
-    result.rows[0].comment_count = commentCount.rows[0].count;
-    return result.rows[0];
+    return result.rows;
   } else {
     return Promise.reject({ status: 404, msg: "Id Not Found" });
   }
@@ -40,16 +34,17 @@ exports.tweakSpecificReview = async (review_id, inc_votes) => {
     return Promise.reject({ status: 404, msg: "Id Not Found" });
   }
 
-  const result = await db.query("SELECT * FROM reviews WHERE review_id = $1;", [
-    review_id,
-  ]);
-
-  const commentCount = await db.query(
-    "SELECT COUNT(review_id) FROM comments WHERE review_id = $1;",
-    [review_id]
+  const result = await db.query(
+    "UPDATE reviews SET votes = votes + $1 WHERE review_id = $2 RETURNING *;",
+    [inc_votes, review_id]
   );
 
-  result.rows[0].comment_count = commentCount.rows[0].count;
-  result.rows[0].votes += inc_votes;
-  return result.rows[0];
+  return result.rows;
+};
+
+exports.fetchReviews = async (sort_by = "date") => {
+  const result = await db.query(
+    `SELECT reviews.title, reviews.review_id, reviews.review_img_url, reviews.votes, reviews.owner, reviews.category, reviews.created_at, COUNT(comments.review_id) AS comment_count FROM reviews LEFT JOIN comments ON comments.review_id = reviews.review_id GROUP BY reviews.review_id;`
+  );
+  return result.rows;
 };
