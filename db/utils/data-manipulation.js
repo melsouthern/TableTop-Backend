@@ -1,5 +1,6 @@
 // extract any functions you are using to manipulate your data, into this file
 const db = require("../connection");
+const { sort } = require("../data/test-data/categories");
 
 exports.formatCategoryDataToNested = (categoryData) => {
   const formattedCategoryData = categoryData.map((category) => {
@@ -58,4 +59,30 @@ exports.checkReviewIdExists = async (review_id) => {
 exports.checkReviewIdDataType = (review_id) => {
   const regex = /^\d+$/;
   return regex.test(review_id);
+};
+
+exports.checkColumnExists = (sort_by) => {
+  if (
+    sort_by === "title" ||
+    sort_by === "review_id" ||
+    sort_by === "review_img_url" ||
+    sort_by === "votes" ||
+    sort_by === "owner" ||
+    sort_by === "category" ||
+    sort_by === "created_at" ||
+    sort_by === "comment_count"
+  ) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
+exports.checkOrderSpecifier = (order) => {
+  const orderCopy = order.toUpperCase();
+  if (orderCopy === "DESC" || orderCopy === "ASC") {
+    return true;
+  } else {
+    return false;
+  }
 };

@@ -35,8 +35,8 @@ exports.patchSpecificReview = async (req, res, next) => {
 
 exports.getReviews = async (req, res, next) => {
   try {
-    const { sort_by } = req.query;
-    const result = await fetchReviews(sort_by);
+    const { sort_by, order } = req.query;
+    const result = await fetchReviews(sort_by, order);
     res.status(200).send({ reviews: result });
   } catch (err) {
     next(err);

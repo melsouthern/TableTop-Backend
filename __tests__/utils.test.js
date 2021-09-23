@@ -3,6 +3,7 @@ const {
   formatUserDataToNested,
   formatReviewDataToNested,
   formatCommentDataToNested,
+  checkReviewIdExists,
 } = require("../db/utils/data-manipulation");
 
 describe("formatCategoryDataToNested", () => {

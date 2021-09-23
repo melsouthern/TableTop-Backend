@@ -3,6 +3,7 @@ const testData = require("../db/data/test-data/index.js");
 const seed = require("../db/seeds/seed.js");
 const app = require("../app");
 const request = require("supertest");
+const { toBeSortedBy } = require("jest-sorted");
 
 beforeEach(() => seed(testData));
 afterAll(() => db.end());
@@ -175,25 +176,83 @@ describe("GET /api/reviews", () => {
     const result = await request(app).get("/aip/reviews").expect(404);
     expect(result.body.msg).toBe("Invalid URL");
   });
-  test("200: should accept sort_by query and sort reviews by column defined", async () => {
-    const result = await request(app)
+  test("200: accepts sort_by query and sort reviews by column defined", async () => {
+    const ownerResult = await request(app)
       .get("/api/reviews?sort_by=owner")
       .expect(200);
+    expect(ownerResult.body.reviews).toBeSortedBy("owner", {
+      descending: true,
+    });
+    const titleResult = await request(app)
+      .get("/api/reviews?sort_by=title")
+      .expect(200);
+    expect(titleResult.body.reviews).toBeSortedBy("title", {
+      descending: true,
+    });
+    const reviewIdResult = await request(app)
+      .get("/api/reviews?sort_by=review_id")
+      .expect(200);
+    expect(reviewIdResult.body.reviews).toBeSortedBy("review_id", {
+      descending: true,
+    });
+    const categoryResult = await request(app)
+      .get("/api/reviews?sort_by=category")
+      .expect(200);
+    expect(categoryResult.body.reviews).toBeSortedBy("category", {
+      descending: true,
+    });
   });
+  test("400: responds with error messaged when provided sort_by column is not legitimate", async () => {
+    const stringResult = await request(app)
+      .get("/api/reviews?sort_by=cats")
+      .expect(400);
+    expect(stringResult.body.msg).toBe("Bad Request");
+    const numResult = await request(app)
+      .get("/api/reviews?sort_by=74738383")
+      .expect(400);
+    expect(numResult.body.msg).toBe("Bad Request");
+  });
+  test("200: responds with reviews ordered by ASC or DESC if declared", async () => {
+    const ascResult = await request(app)
+      .get("/api/reviews?order=asc")
+      .expect(200);
+    expect(ascResult.body.reviews).toBeSortedBy("created_at", {
+      descending: false,
+    });
+    const descResult = await request(app)
+      .get("/api/reviews?order=desc")
+      .expect(200);
+    expect(descResult.body.reviews).toBeSortedBy("created_at", {
+      descending: true,
+    });
+  });
+  test("400: responds with error messaged when provided order statement is not legitimate", async () => {
+    const stringResult = await request(app)
+      .get("/api/reviews?order=cats")
+      .expect(400);
+    expect(stringResult.body.msg).toBe("Bad Request");
+    const numResult = await request(app)
+      .get("/api/reviews?order=74738383")
+      .expect(400);
+    expect(numResult.body.msg).toBe("Bad Request");
+  });
+  test("200: responds to sort_by and order statement in the same path", async () => {
+    const result = await request(app)
+      .get("/api/reviews?sort_by=comment_count&order=asc")
+      .expect(200);
+    expect(result.body.reviews).toBeSortedBy("comment_count", {
+      descending: false,
+    });
+  });
+  test("200: responds with array sorted by created_by and orders as DESC as default", async () => {
+    const result = await request(app).get("/api/reviews").expect(200);
+    expect(result.body.reviews).toBeSortedBy("created_at", {
+      descending: true,
+    });
+  });
+  test("200: responds with a filtered array when category query is specified", async () => {});
 });
 
-//api/reviews?sort_by=owner
-//api/reviews?sort_by=title
-//api/reviews?sort_by=review_id
-//api/reviews?sort_by=category
-//api/reviews?sort_by=review_img_url
-//api/reviews?sort_by=created_at
-//api/reviews?sort_by=votes
-//api/reviews?sort_by=comment_count
-//api/reviews?sort_by (defaults to date)
-//api/reviews?order=asc
-//api/reviews?order=desc
-//api/reviews?order (defaults to desc)
-//api/reviews?category='social deduction'
-//api/reviews?category='euro game'
-//api/reviews?category (throw err)
+//api/reviews?category=social_deduction
+//api/reviews?category=euro_game
+////api/reviews?sort_by=owner&order=desc&category=social_deduction
