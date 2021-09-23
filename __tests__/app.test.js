@@ -167,6 +167,7 @@ describe("GET /api/reviews", () => {
         comment_count: expect.any(String),
       });
     });
+    expect(result.body.reviews.length).toBe(13);
   });
   test("404: responds with error message if reviews spelled incorrectly", async () => {
     const result = await request(app).get("/api/revieews").expect(404);
@@ -201,8 +202,12 @@ describe("GET /api/reviews", () => {
     expect(categoryResult.body.reviews).toBeSortedBy("category", {
       descending: true,
     });
+    expect(ownerResult.body.reviews.length).toBe(13);
+    expect(titleResult.body.reviews.length).toBe(13);
+    expect(reviewIdResult.body.reviews.length).toBe(13);
+    expect(categoryResult.body.reviews.length).toBe(13);
   });
-  test("400: responds with error messaged when provided sort_by column is not legitimate", async () => {
+  test("400: responds with error message when provided sort_by column is not legitimate", async () => {
     const stringResult = await request(app)
       .get("/api/reviews?sort_by=cats")
       .expect(400);
@@ -225,8 +230,10 @@ describe("GET /api/reviews", () => {
     expect(descResult.body.reviews).toBeSortedBy("created_at", {
       descending: true,
     });
+    expect(ascResult.body.reviews.length).toBe(13);
+    expect(descResult.body.reviews.length).toBe(13);
   });
-  test("400: responds with error messaged when provided order statement is not legitimate", async () => {
+  test("400: responds with error message when provided order statement is not legitimate", async () => {
     const stringResult = await request(app)
       .get("/api/reviews?order=cats")
       .expect(400);
@@ -243,16 +250,80 @@ describe("GET /api/reviews", () => {
     expect(result.body.reviews).toBeSortedBy("comment_count", {
       descending: false,
     });
+    expect(result.body.reviews.length).toBe(13);
   });
   test("200: responds with array sorted by created_by and orders as DESC as default", async () => {
     const result = await request(app).get("/api/reviews").expect(200);
     expect(result.body.reviews).toBeSortedBy("created_at", {
       descending: true,
     });
+    expect(result.body.reviews.length).toBe(13);
   });
-  test("200: responds with a filtered array when category query is specified", async () => {});
+  test("200: responds with a filtered array when category query is specified", async () => {
+    const socialResult = await request(app)
+      .get("/api/reviews?category=social_deduction")
+      .expect(200);
+    socialResult.body.reviews.forEach((review) => {
+      expect(review).toMatchObject({
+        review_id: expect.any(Number),
+        title: expect.any(String),
+        review_img_url: expect.any(String),
+        votes: expect.any(Number),
+        category: "social deduction",
+        owner: expect.any(String),
+        created_at: expect.any(String),
+        comment_count: expect.any(String),
+      });
+    });
+    expect(socialResult.body.reviews.length).toBe(11);
+    const euroResult = await request(app)
+      .get("/api/reviews?category=euro_game")
+      .expect(200);
+    euroResult.body.reviews.forEach((review) => {
+      expect(review).toMatchObject({
+        review_id: expect.any(Number),
+        title: expect.any(String),
+        review_img_url: expect.any(String),
+        votes: expect.any(Number),
+        category: "euro game",
+        owner: expect.any(String),
+        created_at: expect.any(String),
+        comment_count: expect.any(String),
+      });
+    });
+    expect(euroResult.body.reviews.length).toBe(1);
+  });
+  test("400: responds with error message when provided category statement is not legitimate", async () => {
+    const stringResult = await request(app)
+      .get("/api/reviews?category=cats!")
+      .expect(400);
+    expect(stringResult.body.msg).toBe("Bad Request");
+    const numResult = await request(app)
+      .get("/api/reviews?order=74736763")
+      .expect(400);
+    expect(numResult.body.msg).toBe("Bad Request");
+  });
+  test("200: category query, sort_by query and order query work together to provide result", async () => {
+    const result = await request(app)
+      .get(
+        "/api/reviews?sort_by=comment_count&order=asc&category=social_deduction"
+      )
+      .expect(200);
+    expect(result.body.reviews).toBeSortedBy("comment_count", {
+      descending: false,
+    });
+    expect(result.body.reviews.length).toBe(11);
+    result.body.reviews.forEach((review) => {
+      expect(review).toMatchObject({
+        review_id: expect.any(Number),
+        title: expect.any(String),
+        review_img_url: expect.any(String),
+        votes: expect.any(Number),
+        category: "social deduction",
+        owner: expect.any(String),
+        created_at: expect.any(String),
+        comment_count: expect.any(String),
+      });
+    });
+  });
 });
-
-//api/reviews?category=social_deduction
-//api/reviews?category=euro_game
-////api/reviews?sort_by=owner&order=desc&category=social_deduction

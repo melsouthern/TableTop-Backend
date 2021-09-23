@@ -86,3 +86,18 @@ exports.checkOrderSpecifier = (order) => {
     return false;
   }
 };
+
+exports.checkCategoryExists = async (category) => {
+  let checkCategory = category.split("_").join(" ");
+  result = await db.query(`SELECT reviews.category FROM reviews;`);
+
+  let checker = result.rows.filter((row) => {
+    return row.category === checkCategory;
+  });
+
+  if (checker.length > 0) {
+    return checkCategory;
+  } else {
+    return false;
+  }
+};

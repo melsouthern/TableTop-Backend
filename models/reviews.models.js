@@ -4,6 +4,7 @@ const {
   checkReviewIdDataType,
   checkColumnExists,
   checkOrderSpecifier,
+  checkCategoryExists,
 } = require("../db/utils/data-manipulation");
 
 exports.fetchSpecificReview = async (review_id) => {
@@ -44,7 +45,11 @@ exports.tweakSpecificReview = async (review_id, inc_votes) => {
   return result.rows;
 };
 
-exports.fetchReviews = async (sort_by = "created_at", order = "DESC") => {
+exports.fetchReviews = async (
+  sort_by = "created_at",
+  order = "DESC",
+  category
+) => {
   const checkedSort = await checkColumnExists(sort_by);
   if (!checkedSort) {
     return Promise.reject({ status: 400, msg: "Bad Request" });
@@ -57,19 +62,20 @@ exports.fetchReviews = async (sort_by = "created_at", order = "DESC") => {
 
   const orderCopy = order.toUpperCase();
 
-  let queryStr = `SELECT reviews.title, reviews.review_id, reviews.review_img_url, reviews.votes, reviews.owner, reviews.category, reviews.created_at, COUNT(comments.review_id) AS comment_count FROM reviews LEFT JOIN comments ON comments.review_id = reviews.review_id GROUP BY reviews.review_id ORDER BY ${sort_by} ${orderCopy}`;
+  if (category) {
+    const checkedCategory = await checkCategoryExists(category);
+    if (!checkedCategory) {
+      return Promise.reject({ status: 400, msg: "Bad Request" });
+    }
 
-  // if (order === "DESC") {
-  //   queryStr += " DESC;";
-  // }
-  // if (order === "ASC") {
-  //   queryStr += " ASC;";
-  // }
+    let queryStr = `SELECT reviews.title, reviews.review_id, reviews.review_img_url, reviews.votes, reviews.owner, reviews.category, reviews.created_at, COUNT(comments.review_id) AS comment_count FROM reviews LEFT JOIN comments ON comments.review_id = reviews.review_id WHERE category='${checkedCategory}' GROUP BY reviews.review_id ORDER BY ${sort_by} ${orderCopy}`;
 
-  const result = await db.query(queryStr);
-  return result.rows;
-  // const result = await db.query(
-  //   `SELECT reviews.title, reviews.review_id, reviews.review_img_url, reviews.votes, reviews.owner, reviews.category, reviews.created_at, COUNT(comments.review_id) AS comment_count FROM reviews LEFT JOIN comments ON comments.review_id = reviews.review_id GROUP BY reviews.review_id ORDER BY ${sort_by}`
-  // );
-  // return result.rows;
+    const result = await db.query(queryStr);
+    return result.rows;
+  } else {
+    let queryStr = `SELECT reviews.title, reviews.review_id, reviews.review_img_url, reviews.votes, reviews.owner, reviews.category, reviews.created_at, COUNT(comments.review_id) AS comment_count FROM reviews LEFT JOIN comments ON comments.review_id = reviews.review_id GROUP BY reviews.review_id ORDER BY ${sort_by} ${orderCopy}`;
+
+    const result = await db.query(queryStr);
+    return result.rows;
+  }
 };
