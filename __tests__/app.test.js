@@ -71,16 +71,22 @@ describe("GET /api/reviews/:review_id", () => {
     );
   });
   test("400: responds with error message if incorrect data type provided as the review_id ", async () => {
-    const result = await request(app).get("/api/reviews/cats").expect(400);
-    expect(result.body.msg).toBe(
+    const stringResult = await request(app)
+      .get("/api/reviews/cats")
+      .expect(400);
+    expect(stringResult.body.msg).toBe(
       "Invalid Data Type - review_id provided is not an authorised input"
     );
-    const result1 = await request(app).get("/api/reviews/!@+$").expect(400);
-    expect(result1.body.msg).toBe(
+    const specialCharResult = await request(app)
+      .get("/api/reviews/!@+$")
+      .expect(400);
+    expect(specialCharResult.body.msg).toBe(
       "Invalid Data Type - review_id provided is not an authorised input"
     );
-    const result2 = await request(app).get("/api/reviews/M30w").expect(400);
-    expect(result2.body.msg).toBe(
+    const numAndStringResult = await request(app)
+      .get("/api/reviews/M30w")
+      .expect(400);
+    expect(numAndStringResult.body.msg).toBe(
       "Invalid Data Type - review_id provided is not an authorised input"
     );
   });
@@ -88,11 +94,11 @@ describe("GET /api/reviews/:review_id", () => {
 
 describe("PATCH /api/reviews/:review_id", () => {
   test("200: tweaks the votes property by either incrementing or decrementing the value, then responds with the updated review ", async () => {
-    const result = await request(app)
+    const positiveNumResult = await request(app)
       .patch("/api/reviews/3")
       .send({ inc_votes: 3 })
       .expect(200);
-    expect(result.body.review).toEqual([
+    expect(positiveNumResult.body.review).toEqual([
       {
         review_id: 3,
         title: "Ultimate Werewolf",
@@ -106,11 +112,11 @@ describe("PATCH /api/reviews/:review_id", () => {
         created_at: "2021-01-18T10:01:41.251Z",
       },
     ]);
-    const result1 = await request(app)
+    const negativeNumResult = await request(app)
       .patch("/api/reviews/3")
       .send({ inc_votes: -10 })
       .expect(200);
-    expect(result1.body.review).toEqual([
+    expect(negativeNumResult.body.review).toEqual([
       {
         review_id: 3,
         title: "Ultimate Werewolf",
@@ -142,25 +148,25 @@ describe("PATCH /api/reviews/:review_id", () => {
     );
   });
   test("400: responds with error message if incorrect data type provided as the review_id ", async () => {
-    const result = await request(app)
+    const stringResult = await request(app)
       .patch("/api/reviews/cats")
       .send({ inc_votes: 3 })
       .expect(400);
-    expect(result.body.msg).toBe(
+    expect(stringResult.body.msg).toBe(
       "Invalid Data Type - review_id provided is not an authorised input"
     );
-    const result1 = await request(app)
+    const specialCharResult = await request(app)
       .patch("/api/reviews/!@+$")
       .send({ inc_votes: 3 })
       .expect(400);
-    expect(result1.body.msg).toBe(
+    expect(specialCharResult.body.msg).toBe(
       "Invalid Data Type - review_id provided is not an authorised input"
     );
-    const result2 = await request(app)
+    const numAndStringResult = await request(app)
       .patch("/api/reviews/M30w")
       .send({ inc_votes: 3 })
       .expect(400);
-    expect(result2.body.msg).toBe(
+    expect(numAndStringResult.body.msg).toBe(
       "Invalid Data Type - review_id provided is not an authorised input"
     );
   });
@@ -413,22 +419,22 @@ describe("GET /api/reviews/:review_id/comments", () => {
     );
   });
   test("400: responds with error message if incorrect data type provided as the review_id ", async () => {
-    const result = await request(app)
+    const stringResult = await request(app)
       .get("/api/reviews/cats/comments")
       .expect(400);
-    expect(result.body.msg).toBe(
+    expect(stringResult.body.msg).toBe(
       "Invalid Data Type - review_id provided is not an authorised input"
     );
-    const result1 = await request(app)
+    const specialCharResult = await request(app)
       .get("/api/reviews/!@+$/comments")
       .expect(400);
-    expect(result1.body.msg).toBe(
+    expect(specialCharResult.body.msg).toBe(
       "Invalid Data Type - review_id provided is not an authorised input"
     );
-    const result2 = await request(app)
+    const numAndStringResult = await request(app)
       .get("/api/reviews/M30w/comments")
       .expect(400);
-    expect(result2.body.msg).toBe(
+    expect(numAndStringResult.body.msg).toBe(
       "Invalid Data Type - review_id provided is not an authorised input"
     );
   });
@@ -479,25 +485,25 @@ describe("POST /api/reviews/:review_id/comments", () => {
     );
   });
   test("400: responds with error message if incorrect data type provided as the review_id", async () => {
-    const result = await request(app)
+    const stringResult = await request(app)
       .post("/api/reviews/cats/comments")
       .send({ username: "dav3rid", body: "my cat loves this game!" })
       .expect(400);
-    expect(result.body.msg).toBe(
+    expect(stringResult.body.msg).toBe(
       "Invalid Data Type - review_id provided is not an authorised input"
     );
-    const result1 = await request(app)
+    const specialCharResult = await request(app)
       .post("/api/reviews/!!!/comments")
       .send({ username: "dav3rid", body: "my cat loves this game!" })
       .expect(400);
-    expect(result1.body.msg).toBe(
+    expect(specialCharResult.body.msg).toBe(
       "Invalid Data Type - review_id provided is not an authorised input"
     );
-    const result2 = await request(app)
+    const numAndStringResult = await request(app)
       .post("/api/reviews/me3330w/comments")
       .send({ username: "dav3rid", body: "my cat loves this game!" })
       .expect(400);
-    expect(result2.body.msg).toBe(
+    expect(numAndStringResult.body.msg).toBe(
       "Invalid Data Type - review_id provided is not an authorised input"
     );
   });
