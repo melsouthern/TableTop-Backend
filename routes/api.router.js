@@ -4,9 +4,10 @@ const categoriesRouter = require("./categories.router");
 const reviewsRouter = require("./reviews.router");
 const commentsRouter = require("./comments.router");
 const usersRouter = require("./users.router");
+const apiDocuments = require("../endpoints.json");
 
 apiRouter.get("/", (req, res) => {
-  res.json({ "GET /api/categories": "hi" });
+  res.json(apiDocuments);
 });
 
 apiRouter.use("/categories", categoriesRouter);
