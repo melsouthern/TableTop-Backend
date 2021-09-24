@@ -1,6 +1,5 @@
 // extract any functions you are using to manipulate your data, into this file
 const db = require("../connection");
-const { sort } = require("../data/test-data/categories");
 
 exports.formatCategoryDataToNested = (categoryData) => {
   const formattedCategoryData = categoryData.map((category) => {
@@ -49,11 +48,7 @@ exports.checkReviewIdExists = async (review_id) => {
   const result = await db.query("SELECT * FROM reviews WHERE review_id = $1;", [
     review_id,
   ]);
-  if (result.rows.length === 0) {
-    return false;
-  } else {
-    return true;
-  }
+  return result.rows.length !== 0;
 };
 
 exports.checkReviewIdDataType = (review_id) => {
@@ -62,7 +57,7 @@ exports.checkReviewIdDataType = (review_id) => {
 };
 
 exports.checkColumnExists = (sort_by) => {
-  if (
+  return (
     sort_by === "title" ||
     sort_by === "review_id" ||
     sort_by === "review_img_url" ||
@@ -71,35 +66,23 @@ exports.checkColumnExists = (sort_by) => {
     sort_by === "category" ||
     sort_by === "created_at" ||
     sort_by === "comment_count"
-  ) {
-    return true;
-  } else {
-    return false;
-  }
+  );
 };
 
 exports.checkOrderSpecifier = (order) => {
   const orderCopy = order.toUpperCase();
-  if (orderCopy === "DESC" || orderCopy === "ASC") {
-    return true;
-  } else {
-    return false;
-  }
+  return orderCopy === "DESC" || orderCopy === "ASC";
 };
 
 exports.checkCategoryExists = async (category) => {
-  let checkCategory = category.split("_").join(" ");
-  result = await db.query(`SELECT reviews.category FROM reviews;`);
-
-  let checker = result.rows.filter((row) => {
+  const checkCategory = category.split("_").join(" ");
+  let result = await db.query(`SELECT reviews.category FROM reviews;`);
+  const checker = result.rows.filter((row) => {
     return row.category === checkCategory;
   });
 
   if (checker.length > 0) {
     return checkCategory;
-  } else {
-    return false;
   }
+  return false;
 };
-
-exports.checkAuthorAndBody = async (author, body) => {};

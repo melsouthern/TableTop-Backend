@@ -4,14 +4,19 @@ const seed = require("../db/seeds/seed.js");
 const app = require("../app");
 const request = require("supertest");
 const { toBeSortedBy } = require("jest-sorted");
+const apiDocuments = require("../endpoints.json");
 
 beforeEach(() => seed(testData));
 afterAll(() => db.end());
 
 describe("GET /api", () => {
-  test("200: responds with a successful connection message", async () => {
+  test("200: responds with a JSON describing all the available endpoints in the API", async () => {
     const result = await request(app).get("/api").expect(200);
-    expect(result.body.msg).toBe("Connected to API!");
+    expect(result.body).toEqual(apiDocuments);
+  });
+  test("404: responds with error message if api spelled incorrectly", async () => {
+    const result = await request(app).get("/aip").expect(404);
+    expect(result.body.msg).toBe("Invalid URL - incorrect path provided");
   });
 });
 
@@ -27,11 +32,11 @@ describe("GET /api/categories", () => {
   });
   test("404: responds with error message if categories spelled incorrectly", async () => {
     const result = await request(app).get("/api/categraies").expect(404);
-    expect(result.body.msg).toBe("Invalid URL");
+    expect(result.body.msg).toBe("Invalid URL - incorrect path provided");
   });
   test("404: responds with error message if api spelled incorrectly", async () => {
     const result = await request(app).get("/aip/categories").expect(404);
-    expect(result.body.msg).toBe("Invalid URL");
+    expect(result.body.msg).toBe("Invalid URL - incorrect path provided");
   });
 });
 
@@ -57,7 +62,7 @@ describe("GET /api/reviews/:review_id", () => {
   });
   test("404: responds with error message if reviews spelled incorrectly", async () => {
     const result = await request(app).get("/api/reeviews/10").expect(404);
-    expect(result.body.msg).toBe("Invalid URL");
+    expect(result.body.msg).toBe("Invalid URL - incorrect path provided");
   });
   test("404: responds with error message if review id number not found", async () => {
     const result = await request(app).get("/api/reviews/1000").expect(404);
@@ -117,7 +122,7 @@ describe("PATCH /api/reviews/:review_id", () => {
       .patch("/api/revieews/3")
       .send({ inc_votes: 3 })
       .expect(404);
-    expect(result.body.msg).toBe("Invalid URL");
+    expect(result.body.msg).toBe("Invalid URL - incorrect path provided");
   });
   test("404: responds with error message if review id number not found", async () => {
     const result = await request(app)
@@ -171,11 +176,11 @@ describe("GET /api/reviews", () => {
   });
   test("404: responds with error message if reviews spelled incorrectly", async () => {
     const result = await request(app).get("/api/revieews").expect(404);
-    expect(result.body.msg).toBe("Invalid URL");
+    expect(result.body.msg).toBe("Invalid URL - incorrect path provided");
   });
   test("404: responds with error message if api spelled incorrectly", async () => {
     const result = await request(app).get("/aip/reviews").expect(404);
-    expect(result.body.msg).toBe("Invalid URL");
+    expect(result.body.msg).toBe("Invalid URL - incorrect path provided");
   });
   test("200: accepts sort_by query and sort reviews by column defined", async () => {
     const ownerResult = await request(app)
@@ -361,13 +366,13 @@ describe("GET /api/reviews/:review_id/comments", () => {
     const result = await request(app)
       .get("/api/revieews/2/comments")
       .expect(404);
-    expect(result.body.msg).toBe("Invalid URL");
+    expect(result.body.msg).toBe("Invalid URL - incorrect path provided");
   });
   test("404: responds with error message if api spelled incorrectly", async () => {
     const result = await request(app)
       .get("/aip/reviews/3/comments")
       .expect(404);
-    expect(result.body.msg).toBe("Invalid URL");
+    expect(result.body.msg).toBe("Invalid URL - incorrect path provided");
   });
   test("404: responds with error message if review id number not found", async () => {
     const result = await request(app)
@@ -410,21 +415,21 @@ describe("POST /api/reviews/:review_id/comments", () => {
       .post("/api/revieews/9/comments")
       .send({ username: "dav3rid", body: "my cat loves this game!" })
       .expect(404);
-    expect(result.body.msg).toBe("Invalid URL");
+    expect(result.body.msg).toBe("Invalid URL - incorrect path provided");
   });
   test("404: responds with error message if comments spelled incorrectly", async () => {
     const result = await request(app)
       .post("/api/revieews/9/commeents")
       .send({ username: "dav3rid", body: "my cat loves this game!" })
       .expect(404);
-    expect(result.body.msg).toBe("Invalid URL");
+    expect(result.body.msg).toBe("Invalid URL - incorrect path provided");
   });
   test("404: responds with error message if api spelled incorrectly", async () => {
     const result = await request(app)
       .post("/aip/reviews/9/comments")
       .send({ username: "dav3rid", body: "my cat loves this game!" })
       .expect(404);
-    expect(result.body.msg).toBe("Invalid URL");
+    expect(result.body.msg).toBe("Invalid URL - incorrect path provided");
   });
   test("404: responds with error message if review id number not found", async () => {
     const result = await request(app)
