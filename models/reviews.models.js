@@ -5,6 +5,7 @@ const {
   checkColumnExists,
   checkOrderSpecifier,
   checkCategoryExists,
+  checkAuthorAndBody,
 } = require("../db/utils/data-manipulation");
 
 exports.fetchSpecificReview = async (review_id) => {
@@ -97,4 +98,22 @@ exports.fetchSpecificReviewComments = async (review_id) => {
   } else {
     return Promise.reject({ status: 404, msg: "Id Not Found" });
   }
+};
+
+exports.publishComment = async (review_id, username, body) => {
+  const checkedDataType = await checkReviewIdDataType(review_id);
+  if (!checkedDataType) {
+    return Promise.reject({ status: 400, msg: "Invalid Data Type" });
+  }
+
+  const checkedId = await checkReviewIdExists(review_id);
+  if (!checkedId) {
+    return Promise.reject({ status: 404, msg: "Id Not Found" });
+  }
+
+  const result = await db.query(
+    `INSERT INTO comments (review_id, author, body) VALUES ($1, $2, $3) RETURNING comment_id, votes, created_at, author, body;`,
+    [review_id, username, body]
+  );
+  return result.rows;
 };

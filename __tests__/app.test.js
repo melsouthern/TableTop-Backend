@@ -390,3 +390,81 @@ describe("GET /api/reviews/:review_id/comments", () => {
     expect(result2.body.msg).toBe("Invalid Data Type");
   });
 });
+
+describe("POST /api/reviews/:review_id/comments", () => {
+  test("201: responds with the posted comment", async () => {
+    const result = await request(app)
+      .post("/api/reviews/2/comments")
+      .send({ username: "dav3rid", body: "my cat loves this game!" })
+      .expect(201);
+    expect(result.body.comment[0]).toMatchObject({
+      comment_id: expect.any(Number),
+      votes: 0,
+      created_at: expect.any(String),
+      author: "dav3rid",
+      body: "my cat loves this game!",
+    });
+  });
+  test("404: responds with error message if reviews spelled incorrectly", async () => {
+    const result = await request(app)
+      .post("/api/revieews/9/comments")
+      .send({ username: "dav3rid", body: "my cat loves this game!" })
+      .expect(404);
+    expect(result.body.msg).toBe("Invalid URL");
+  });
+  test("404: responds with error message if comments spelled incorrectly", async () => {
+    const result = await request(app)
+      .post("/api/revieews/9/commeents")
+      .send({ username: "dav3rid", body: "my cat loves this game!" })
+      .expect(404);
+    expect(result.body.msg).toBe("Invalid URL");
+  });
+  test("404: responds with error message if api spelled incorrectly", async () => {
+    const result = await request(app)
+      .post("/aip/reviews/9/comments")
+      .send({ username: "dav3rid", body: "my cat loves this game!" })
+      .expect(404);
+    expect(result.body.msg).toBe("Invalid URL");
+  });
+  test("404: responds with error message if review id number not found", async () => {
+    const result = await request(app)
+      .post("/api/reviews/900000/comments")
+      .send({ username: "dav3rid", body: "my cat loves this game!" })
+      .expect(404);
+    expect(result.body.msg).toBe("Id Not Found");
+  });
+  test("400: responds with error message if incorrect data type provided as the review_id", async () => {
+    const result = await request(app)
+      .post("/api/reviews/cats/comments")
+      .send({ username: "dav3rid", body: "my cat loves this game!" })
+      .expect(400);
+    expect(result.body.msg).toBe("Invalid Data Type");
+    const result1 = await request(app)
+      .post("/api/reviews/!!!/comments")
+      .send({ username: "dav3rid", body: "my cat loves this game!" })
+      .expect(400);
+    expect(result1.body.msg).toBe("Invalid Data Type");
+    const result2 = await request(app)
+      .post("/api/reviews/me3330w/comments")
+      .send({ username: "dav3rid", body: "my cat loves this game!" })
+      .expect(400);
+    expect(result2.body.msg).toBe("Invalid Data Type");
+  });
+  test("404: responds with error message if user provided does not exist", async () => {
+    const result = await request(app)
+      .post("/api/reviews/2/comments")
+      .send({
+        username: "catLady400",
+        body: "My 24 cats love to chew on the blocks",
+      })
+      .expect(404);
+    expect(result.body.msg).toBe("User Non-Existent");
+  });
+  test("400: responds with error message if post content is provided in wrong format", async () => {
+    const result = await request(app)
+      .post("/api/reviews/2/comments")
+      .send({ user: "dav3rid", bod: "my cat loves this game!" })
+      .expect(400);
+    expect(result.body.msg).toBe("Bad Request");
+  });
+});

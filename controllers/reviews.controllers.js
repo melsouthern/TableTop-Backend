@@ -3,6 +3,7 @@ const {
   tweakSpecificReview,
   fetchReviews,
   fetchSpecificReviewComments,
+  publishComment,
 } = require("../models/reviews.models");
 
 exports.getSpecificReview = async (req, res, next) => {
@@ -49,6 +50,26 @@ exports.getSpecificReviewComments = async (req, res, next) => {
     const { review_id } = req.params;
     const result = await fetchSpecificReviewComments(review_id);
     res.status(200).send({ comments: result });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.postComment = async (req, res, next) => {
+  try {
+    if (
+      Object.keys(req.body).length < 2 ||
+      Object.keys(req.body).length > 2 ||
+      req.body.hasOwnProperty("username") === false ||
+      req.body.hasOwnProperty("body") === false
+    ) {
+      await Promise.reject({ status: 400, msg: "Bad Request" });
+    }
+
+    const { review_id } = req.params;
+    const { username, body } = req.body;
+    const result = await publishComment(review_id, username, body);
+    res.status(201).send({ comment: result });
   } catch (err) {
     next(err);
   }

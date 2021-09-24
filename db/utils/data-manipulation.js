@@ -101,3 +101,5 @@ exports.checkCategoryExists = async (category) => {
     return false;
   }
 };
+
+exports.checkAuthorAndBody = async (author, body) => {};
