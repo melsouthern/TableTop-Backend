@@ -6,7 +6,7 @@ const commentsRouter = require("./comments.router");
 const usersRouter = require("./users.router");
 
 apiRouter.get("/", (req, res) => {
-  res.status(200).send({ msg: "Connected to API!" });
+  res.json({ "GET /api/categories": "hi" });
 });
 
 apiRouter.use("/categories", categoriesRouter);

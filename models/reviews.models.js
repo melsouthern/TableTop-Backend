@@ -5,7 +5,6 @@ const {
   checkColumnExists,
   checkOrderSpecifier,
   checkCategoryExists,
-  checkAuthorAndBody,
 } = require("../db/utils/data-manipulation");
 
 exports.fetchSpecificReview = async (review_id) => {
