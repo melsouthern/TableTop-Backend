@@ -25,7 +25,10 @@ exports.patchSpecificReview = async (req, res, next) => {
       Object.keys(req.body).length !== 1 ||
       req.body.hasOwnProperty("inc_votes") === false
     ) {
-      await Promise.reject({ status: 400, msg: "Bad Request" });
+      await Promise.reject({
+        status: 400,
+        msg: "Bad Request - incorrect format of patch request",
+      });
     }
 
     const result = await tweakSpecificReview(review_id, inc_votes);

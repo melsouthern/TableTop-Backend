@@ -64,12 +64,18 @@ exports.fetchReviews = async (
 ) => {
   const checkedSort = await checkColumnExists(sort_by);
   if (!checkedSort) {
-    return Promise.reject({ status: 400, msg: "Bad Request" });
+    return Promise.reject({
+      status: 400,
+      msg: "Bad Request - sort_by statement is provided incorrectly",
+    });
   }
 
   const checkedOrder = await checkOrderSpecifier(order);
   if (!checkedOrder) {
-    return Promise.reject({ status: 400, msg: "Bad Request" });
+    return Promise.reject({
+      status: 400,
+      msg: "Bad Request - order statement is provided incorrectly",
+    });
   }
 
   const orderCopy = order.toUpperCase();
@@ -77,7 +83,10 @@ exports.fetchReviews = async (
   if (category) {
     const checkedCategory = await checkCategoryExists(category);
     if (!checkedCategory) {
-      return Promise.reject({ status: 400, msg: "Bad Request" });
+      return Promise.reject({
+        status: 400,
+        msg: "Bad Request - category statement is provided incorrectly",
+      });
     }
 
     let queryStr = `SELECT reviews.title, reviews.review_id, reviews.review_img_url, reviews.votes, reviews.owner, reviews.category, reviews.created_at, COUNT(comments.review_id) AS comment_count FROM reviews LEFT JOIN comments ON comments.review_id = reviews.review_id WHERE category='${checkedCategory}' GROUP BY reviews.review_id ORDER BY ${sort_by} ${orderCopy}`;

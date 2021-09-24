@@ -169,7 +169,9 @@ describe("PATCH /api/reviews/:review_id", () => {
       .patch("/api/reviews/3")
       .send({ inc_votes: 4, category: "cats" })
       .expect(400);
-    expect(result.body.msg).toBe("Bad Request");
+    expect(result.body.msg).toBe(
+      "Bad Request - incorrect format of patch request"
+    );
   });
 });
 
@@ -232,11 +234,15 @@ describe("GET /api/reviews", () => {
     const stringResult = await request(app)
       .get("/api/reviews?sort_by=cats")
       .expect(400);
-    expect(stringResult.body.msg).toBe("Bad Request");
+    expect(stringResult.body.msg).toBe(
+      "Bad Request - sort_by statement is provided incorrectly"
+    );
     const numResult = await request(app)
       .get("/api/reviews?sort_by=74738383")
       .expect(400);
-    expect(numResult.body.msg).toBe("Bad Request");
+    expect(numResult.body.msg).toBe(
+      "Bad Request - sort_by statement is provided incorrectly"
+    );
   });
   test("200: responds with reviews ordered by ASC or DESC if declared", async () => {
     const ascResult = await request(app)
@@ -258,11 +264,15 @@ describe("GET /api/reviews", () => {
     const stringResult = await request(app)
       .get("/api/reviews?order=cats")
       .expect(400);
-    expect(stringResult.body.msg).toBe("Bad Request");
+    expect(stringResult.body.msg).toBe(
+      "Bad Request - order statement is provided incorrectly"
+    );
     const numResult = await request(app)
       .get("/api/reviews?order=74738383")
       .expect(400);
-    expect(numResult.body.msg).toBe("Bad Request");
+    expect(numResult.body.msg).toBe(
+      "Bad Request - order statement is provided incorrectly"
+    );
   });
   test("200: responds to sort_by and order statement in the same path", async () => {
     const result = await request(app)
@@ -318,11 +328,15 @@ describe("GET /api/reviews", () => {
     const stringResult = await request(app)
       .get("/api/reviews?category=cats!")
       .expect(400);
-    expect(stringResult.body.msg).toBe("Bad Request");
+    expect(stringResult.body.msg).toBe(
+      "Bad Request - category statement is provided incorrectly"
+    );
     const numResult = await request(app)
       .get("/api/reviews?order=74736763")
       .expect(400);
-    expect(numResult.body.msg).toBe("Bad Request");
+    expect(numResult.body.msg).toBe(
+      "Bad Request - order statement is provided incorrectly"
+    );
   });
   test("200: category query, sort_by query and order query work together to provide result", async () => {
     const result = await request(app)
