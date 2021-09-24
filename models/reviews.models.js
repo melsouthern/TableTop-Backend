@@ -10,7 +10,10 @@ const {
 exports.fetchSpecificReview = async (review_id) => {
   const checkedDataType = await checkReviewIdDataType(review_id);
   if (!checkedDataType) {
-    return Promise.reject({ status: 400, msg: "Invalid Data Type" });
+    return Promise.reject({
+      status: 400,
+      msg: "Invalid Data Type - review_id provided is not an authorised input",
+    });
   }
 
   const checkedId = await checkReviewIdExists(review_id);
@@ -22,19 +25,28 @@ exports.fetchSpecificReview = async (review_id) => {
 
     return result.rows;
   } else {
-    return Promise.reject({ status: 404, msg: "Id Not Found" });
+    return Promise.reject({
+      status: 404,
+      msg: "Not Found - review_id provided is non-existent",
+    });
   }
 };
 
 exports.tweakSpecificReview = async (review_id, inc_votes) => {
   const checkedDataType = await checkReviewIdDataType(review_id);
   if (!checkedDataType) {
-    return Promise.reject({ status: 400, msg: "Invalid Data Type" });
+    return Promise.reject({
+      status: 400,
+      msg: "Invalid Data Type - review_id provided is not an authorised input",
+    });
   }
 
   const checkedId = await checkReviewIdExists(review_id);
   if (!checkedId) {
-    return Promise.reject({ status: 404, msg: "Id Not Found" });
+    return Promise.reject({
+      status: 404,
+      msg: "Not Found - review_id provided is non-existent",
+    });
   }
 
   const result = await db.query(
@@ -83,7 +95,10 @@ exports.fetchReviews = async (
 exports.fetchSpecificReviewComments = async (review_id) => {
   const checkedDataType = await checkReviewIdDataType(review_id);
   if (!checkedDataType) {
-    return Promise.reject({ status: 400, msg: "Invalid Data Type" });
+    return Promise.reject({
+      status: 400,
+      msg: "Invalid Data Type - review_id provided is not an authorised input",
+    });
   }
 
   const checkedId = await checkReviewIdExists(review_id);
@@ -95,19 +110,28 @@ exports.fetchSpecificReviewComments = async (review_id) => {
 
     return result.rows;
   } else {
-    return Promise.reject({ status: 404, msg: "Id Not Found" });
+    return Promise.reject({
+      status: 404,
+      msg: "Not Found - review_id provided is non-existent",
+    });
   }
 };
 
 exports.publishComment = async (review_id, username, body) => {
   const checkedDataType = await checkReviewIdDataType(review_id);
   if (!checkedDataType) {
-    return Promise.reject({ status: 400, msg: "Invalid Data Type" });
+    return Promise.reject({
+      status: 400,
+      msg: "Invalid Data Type - review_id provided is not an authorised input",
+    });
   }
 
   const checkedId = await checkReviewIdExists(review_id);
   if (!checkedId) {
-    return Promise.reject({ status: 404, msg: "Id Not Found" });
+    return Promise.reject({
+      status: 404,
+      msg: "Not Found - review_id provided is non-existent",
+    });
   }
 
   const result = await db.query(
