@@ -66,7 +66,10 @@ exports.postComment = async (req, res, next) => {
       req.body.hasOwnProperty("username") === false ||
       req.body.hasOwnProperty("body") === false
     ) {
-      await Promise.reject({ status: 400, msg: "Bad Request" });
+      await Promise.reject({
+        status: 400,
+        msg: "Bad Request - incorrect format of post request",
+      });
     }
 
     const { review_id } = req.params;

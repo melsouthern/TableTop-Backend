@@ -509,13 +509,17 @@ describe("POST /api/reviews/:review_id/comments", () => {
         body: "My 24 cats love to chew on the blocks",
       })
       .expect(404);
-    expect(result.body.msg).toBe("User Non-Existent");
+    expect(result.body.msg).toBe(
+      "Not Found - username provided in post request is non-existent"
+    );
   });
   test("400: responds with error message if post content is provided in wrong format", async () => {
     const result = await request(app)
       .post("/api/reviews/2/comments")
       .send({ user: "dav3rid", bod: "my cat loves this game!" })
       .expect(400);
-    expect(result.body.msg).toBe("Bad Request");
+    expect(result.body.msg).toBe(
+      "Bad Request - incorrect format of post request"
+    );
   });
 });
