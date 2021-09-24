@@ -79,3 +79,22 @@ exports.fetchReviews = async (
     return result.rows;
   }
 };
+
+exports.fetchSpecificReviewComments = async (review_id) => {
+  const checkedDataType = await checkReviewIdDataType(review_id);
+  if (!checkedDataType) {
+    return Promise.reject({ status: 400, msg: "Invalid Data Type" });
+  }
+
+  const checkedId = await checkReviewIdExists(review_id);
+  if (checkedId) {
+    const result = await db.query(
+      `SELECT comment_id, votes, created_at, author, body FROM comments WHERE review_id=$1;`,
+      [review_id]
+    );
+
+    return result.rows;
+  } else {
+    return Promise.reject({ status: 404, msg: "Id Not Found" });
+  }
+};

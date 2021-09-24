@@ -327,3 +327,66 @@ describe("GET /api/reviews", () => {
     });
   });
 });
+
+describe("GET /api/reviews/:review_id/comments", () => {
+  test("200: responds with an array of comments for the provided review_id", async () => {
+    const result = await request(app)
+      .get("/api/reviews/2/comments")
+      .expect(200);
+    expect(result.body.comments).toEqual([
+      {
+        comment_id: 1,
+        votes: 16,
+        created_at: "2017-11-22T12:43:33.389Z",
+        author: "bainesface",
+        body: "I loved this game too!",
+      },
+      {
+        comment_id: 4,
+        votes: 16,
+        created_at: "2017-11-22T12:36:03.389Z",
+        author: "bainesface",
+        body: "EPIC board game!",
+      },
+      {
+        comment_id: 5,
+        votes: 13,
+        created_at: "2021-01-18T10:24:05.410Z",
+        author: "mallionaire",
+        body: "Now this is a story all about how, board games turned my life upside down",
+      },
+    ]);
+  });
+  test("404: responds with error message if reviews spelled incorrectly", async () => {
+    const result = await request(app)
+      .get("/api/revieews/2/comments")
+      .expect(404);
+    expect(result.body.msg).toBe("Invalid URL");
+  });
+  test("404: responds with error message if api spelled incorrectly", async () => {
+    const result = await request(app)
+      .get("/aip/reviews/3/comments")
+      .expect(404);
+    expect(result.body.msg).toBe("Invalid URL");
+  });
+  test("404: responds with error message if review id number not found", async () => {
+    const result = await request(app)
+      .get("/api/reviews/99999/comments")
+      .expect(404);
+    expect(result.body.msg).toBe("Id Not Found");
+  });
+  test("400: responds with error message if incorrect data type provided as the review_id ", async () => {
+    const result = await request(app)
+      .get("/api/reviews/cats/comments")
+      .expect(400);
+    expect(result.body.msg).toBe("Invalid Data Type");
+    const result1 = await request(app)
+      .get("/api/reviews/!@+$/comments")
+      .expect(400);
+    expect(result1.body.msg).toBe("Invalid Data Type");
+    const result2 = await request(app)
+      .get("/api/reviews/M30w/comments")
+      .expect(400);
+    expect(result2.body.msg).toBe("Invalid Data Type");
+  });
+});

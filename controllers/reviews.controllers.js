@@ -2,6 +2,7 @@ const {
   fetchSpecificReview,
   tweakSpecificReview,
   fetchReviews,
+  fetchSpecificReviewComments,
 } = require("../models/reviews.models");
 
 exports.getSpecificReview = async (req, res, next) => {
@@ -38,6 +39,16 @@ exports.getReviews = async (req, res, next) => {
     const { sort_by, order, category } = req.query;
     const result = await fetchReviews(sort_by, order, category);
     res.status(200).send({ reviews: result });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getSpecificReviewComments = async (req, res, next) => {
+  try {
+    const { review_id } = req.params;
+    const result = await fetchSpecificReviewComments(review_id);
+    res.status(200).send({ comments: result });
   } catch (err) {
     next(err);
   }
