@@ -23,7 +23,7 @@ exports.fetchSpecificReview = async (review_id) => {
       [review_id]
     );
 
-    return result.rows;
+    return result.rows[0];
   } else {
     return Promise.reject({
       status: 404,
@@ -54,7 +54,7 @@ exports.tweakSpecificReview = async (review_id, inc_votes) => {
     [inc_votes, review_id]
   );
 
-  return result.rows;
+  return result.rows[0];
 };
 
 exports.fetchReviews = async (

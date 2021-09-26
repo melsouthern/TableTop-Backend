@@ -101,3 +101,18 @@ exports.checkCommentIdExists = async (comment_id) => {
   );
   return result.rows.length !== 0;
 };
+
+exports.checkUserExists = async (user) => {
+  if (typeof user !== "string") {
+    return false;
+  }
+  const result = await db.query(`SELECT username FROM users;`);
+  const checker = result.rows.filter((row) => {
+    return row.username === user;
+  });
+
+  if (checker.length > 0) {
+    return user;
+  }
+  return false;
+};

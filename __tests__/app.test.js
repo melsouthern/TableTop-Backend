@@ -44,22 +44,20 @@ describe("GET /api/categories", () => {
 describe("GET /api/reviews/:review_id", () => {
   test("200: responds with the review object for the relevant review_id provided", async () => {
     const result = await request(app).get("/api/reviews/10").expect(200);
-    expect(result.body.review).toEqual([
-      {
-        review_id: 10,
-        title: "Build you own tour de Yorkshire",
-        review_body:
-          "Cold rain pours on the faces of your team of cyclists, you pulled to the front of the pack early and now your taking on exhaustion cards like there is not tomorrow, you think there are about 2 hands left until you cross the finish line, will you draw enough from your deck to cross before the other team shoot passed? Flamee Rouge is a Racing deck management game where you carefully manage your deck in order to cross the line before your opponents, cyclist can fall slyly behind front runners in their slipstreams to save precious energy for the prefect moment to burst into the lead ",
-        designer: "Asger Harding Granerud",
-        review_img_url:
-          "https://images.pexels.com/photos/258045/pexels-photo-258045.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
-        votes: 10,
-        category: "social deduction",
-        owner: "mallionaire",
-        created_at: "2021-01-18T10:01:41.251Z",
-        comment_count: "0",
-      },
-    ]);
+    expect(result.body.review).toEqual({
+      review_id: 10,
+      title: "Build you own tour de Yorkshire",
+      review_body:
+        "Cold rain pours on the faces of your team of cyclists, you pulled to the front of the pack early and now your taking on exhaustion cards like there is not tomorrow, you think there are about 2 hands left until you cross the finish line, will you draw enough from your deck to cross before the other team shoot passed? Flamee Rouge is a Racing deck management game where you carefully manage your deck in order to cross the line before your opponents, cyclist can fall slyly behind front runners in their slipstreams to save precious energy for the prefect moment to burst into the lead ",
+      designer: "Asger Harding Granerud",
+      review_img_url:
+        "https://images.pexels.com/photos/258045/pexels-photo-258045.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
+      votes: 10,
+      category: "social deduction",
+      owner: "mallionaire",
+      created_at: "2021-01-18T10:01:41.251Z",
+      comment_count: "0",
+    });
   });
   test("404: responds with error message if reviews spelled incorrectly", async () => {
     const result = await request(app).get("/api/reeviews/10").expect(404);
@@ -99,38 +97,34 @@ describe("PATCH /api/reviews/:review_id", () => {
       .patch("/api/reviews/3")
       .send({ inc_votes: 3 })
       .expect(200);
-    expect(positiveNumResult.body.review).toEqual([
-      {
-        review_id: 3,
-        title: "Ultimate Werewolf",
-        review_body: "We couldn't find the werewolf!",
-        designer: "Akihisa Okui",
-        review_img_url:
-          "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
-        votes: 8,
-        category: "social deduction",
-        owner: "bainesface",
-        created_at: "2021-01-18T10:01:41.251Z",
-      },
-    ]);
+    expect(positiveNumResult.body.review).toEqual({
+      review_id: 3,
+      title: "Ultimate Werewolf",
+      review_body: "We couldn't find the werewolf!",
+      designer: "Akihisa Okui",
+      review_img_url:
+        "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+      votes: 8,
+      category: "social deduction",
+      owner: "bainesface",
+      created_at: "2021-01-18T10:01:41.251Z",
+    });
     const negativeNumResult = await request(app)
       .patch("/api/reviews/3")
       .send({ inc_votes: -10 })
       .expect(200);
-    expect(negativeNumResult.body.review).toEqual([
-      {
-        review_id: 3,
-        title: "Ultimate Werewolf",
-        review_body: "We couldn't find the werewolf!",
-        designer: "Akihisa Okui",
-        review_img_url:
-          "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
-        votes: -2,
-        category: "social deduction",
-        owner: "bainesface",
-        created_at: "2021-01-18T10:01:41.251Z",
-      },
-    ]);
+    expect(negativeNumResult.body.review).toEqual({
+      review_id: 3,
+      title: "Ultimate Werewolf",
+      review_body: "We couldn't find the werewolf!",
+      designer: "Akihisa Okui",
+      review_img_url:
+        "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+      votes: -2,
+      category: "social deduction",
+      owner: "bainesface",
+      created_at: "2021-01-18T10:01:41.251Z",
+    });
   });
   test("404: responds with error message if reviews spelled incorrectly", async () => {
     const result = await request(app)
@@ -592,5 +586,29 @@ describe("GET /api/users", () => {
   test("404: responds with error message if api spelled incorrectly", async () => {
     const result = await request(app).get("/aip/users").expect(404);
     expect(result.body.msg).toBe("Invalid URL - incorrect path provided");
+  });
+});
+
+describe("GET /api/users/:username", () => {
+  test("200: responds with the user object for the relevant username provided", async () => {
+    const result = await request(app).get("/api/users/dav3rid").expect(200);
+    expect(result.body.user).toEqual({
+      username: "dav3rid",
+      name: "dave",
+      avatar_url:
+        "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+    });
+  });
+  test("404: responds with error message if users spelled incorrectly", async () => {
+    const result = await request(app).get("/api/userz/dav3rid").expect(404);
+    expect(result.body.msg).toBe("Invalid URL - incorrect path provided");
+  });
+  test("404: responds with error message if username not found", async () => {
+    const result = await request(app)
+      .get("/api/users/HarryHedgehog")
+      .expect(404);
+    expect(result.body.msg).toBe(
+      "Not Found - username provided is non-existent"
+    );
   });
 });
