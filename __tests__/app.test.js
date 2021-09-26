@@ -5,7 +5,6 @@ const app = require("../app");
 const request = require("supertest");
 const { toBeSortedBy } = require("jest-sorted");
 const apiDocuments = require("../endpoints.json");
-const users = require("../db/data/test-data/users.js");
 
 beforeEach(() => seed(testData));
 afterAll(() => db.end());
@@ -609,6 +608,83 @@ describe("GET /api/users/:username", () => {
       .expect(404);
     expect(result.body.msg).toBe(
       "Not Found - username provided is non-existent"
+    );
+  });
+});
+
+describe("PATCH /api/comments/:comment_id", () => {
+  test("200: tweaks the votes property by either incrementing or decrementing the value, then responds with the updated comment", async () => {
+    const positiveNumResult = await request(app)
+      .patch("/api/comments/3")
+      .send({ inc_votes: 3 })
+      .expect(200);
+    expect(positiveNumResult.body.comment).toEqual({
+      comment_id: 3,
+      author: "philippaclaire9",
+      review_id: 3,
+      votes: 13,
+      created_at: "2021-01-18T10:09:48.110Z",
+      body: "I didn't know dogs could play games",
+    });
+    const negativeNumResult = await request(app)
+      .patch("/api/comments/3")
+      .send({ inc_votes: -3 })
+      .expect(200);
+    expect(negativeNumResult.body.comment).toEqual({
+      comment_id: 3,
+      author: "philippaclaire9",
+      review_id: 3,
+      votes: 10,
+      created_at: "2021-01-18T10:09:48.110Z",
+      body: "I didn't know dogs could play games",
+    });
+  });
+  test("404: responds with error message if comments spelled incorrectly", async () => {
+    const result = await request(app)
+      .patch("/api/commentss/3")
+      .send({ inc_votes: 3 })
+      .expect(404);
+    expect(result.body.msg).toBe("Invalid URL - incorrect path provided");
+  });
+  test("404: responds with error message if comment_id number not found", async () => {
+    const result = await request(app)
+      .patch("/api/comments/99999")
+      .send({ inc_votes: 3 })
+      .expect(404);
+    expect(result.body.msg).toBe(
+      "Not Found - comment_id provided is non-existent"
+    );
+  });
+  test("400: responds with error message if incorrect data type provided as the comment_id ", async () => {
+    const stringResult = await request(app)
+      .patch("/api/comments/cats")
+      .send({ inc_votes: 3 })
+      .expect(400);
+    expect(stringResult.body.msg).toBe(
+      "Invalid Data Type - comment_id provided is not an authorised input"
+    );
+    const specialCharResult = await request(app)
+      .patch("/api/comments/!@+$")
+      .send({ inc_votes: 3 })
+      .expect(400);
+    expect(specialCharResult.body.msg).toBe(
+      "Invalid Data Type - comment_id provided is not an authorised input"
+    );
+    const numAndStringResult = await request(app)
+      .patch("/api/comments/M30w")
+      .send({ inc_votes: 3 })
+      .expect(400);
+    expect(numAndStringResult.body.msg).toBe(
+      "Invalid Data Type - comment_id provided is not an authorised input"
+    );
+  });
+  test("400: responds with error message if patch content is provided in wrong format", async () => {
+    const result = await request(app)
+      .patch("/api/comments/3")
+      .send({ inc_votes: 4, category: "cats" })
+      .expect(400);
+    expect(result.body.msg).toBe(
+      "Bad Request - incorrect format of patch request"
     );
   });
 });

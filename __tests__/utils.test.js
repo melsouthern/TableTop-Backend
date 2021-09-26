@@ -9,6 +9,7 @@ const {
   checkOrderSpecifier,
   checkCategoryExists,
   checkCommentIdExists,
+  checkUserExists,
 } = require("../db/utils/data-manipulation");
 
 const testData = require("../db/data/test-data/index.js");
@@ -594,5 +595,26 @@ describe("checkCommentIdExists", () => {
     expect(falseTest1238).toBe(false);
     const falseTest456 = await checkCommentIdExists(456);
     expect(falseTest456).toBe(false);
+  });
+});
+
+describe("checkUserExists", () => {
+  it("should return either true or false when passed a variable", async () => {
+    const testingFalse = await checkUserExists("cats");
+    expect(testingFalse).toBe(false);
+    const testingTrue = await checkUserExists("dav3rid");
+    expect(testingTrue).toBe(true);
+  });
+  it("should return false when user argument passed is not a username in the users table", async () => {
+    const testingString = await checkUserExists("catsAndDogs");
+    expect(testingString).toBe(false);
+    const testingNum = await checkUserExists(678);
+    expect(testingNum).toBe(false);
+  });
+  it("should return true when user argument passed is a username in the users table", async () => {
+    const testingMallionaire = await checkUserExists("mallionaire");
+    expect(testingMallionaire).toBe(true);
+    const testingEuroGame = await checkUserExists("bainesface");
+    expect(testingEuroGame).toBe(true);
   });
 });

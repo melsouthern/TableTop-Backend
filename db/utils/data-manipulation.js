@@ -112,7 +112,7 @@ exports.checkUserExists = async (user) => {
   });
 
   if (checker.length > 0) {
-    return user;
+    return true;
   }
   return false;
 };
