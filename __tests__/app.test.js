@@ -5,6 +5,7 @@ const app = require("../app");
 const request = require("supertest");
 const { toBeSortedBy } = require("jest-sorted");
 const apiDocuments = require("../endpoints.json");
+const users = require("../db/data/test-data/users.js");
 
 beforeEach(() => seed(testData));
 afterAll(() => db.end());
@@ -572,5 +573,24 @@ describe("DELETE /api/comments/comment_id", () => {
     expect(result.body.msg).toBe(
       "Not Found - comment_id provided is non-existent"
     );
+  });
+});
+
+describe("GET /api/users", () => {
+  test("200: responds with an array of objects which should each have a username property", async () => {
+    const result = await request(app).get("/api/users").expect(200);
+    result.body.users.forEach((user) => {
+      expect(user).toMatchObject({
+        username: expect.any(String),
+      });
+    });
+  });
+  test("404: responds with error message if users spelled incorrectly", async () => {
+    const result = await request(app).get("/api/uzers").expect(404);
+    expect(result.body.msg).toBe("Invalid URL - incorrect path provided");
+  });
+  test("404: responds with error message if api spelled incorrectly", async () => {
+    const result = await request(app).get("/aip/users").expect(404);
+    expect(result.body.msg).toBe("Invalid URL - incorrect path provided");
   });
 });

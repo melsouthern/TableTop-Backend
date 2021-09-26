@@ -2,7 +2,7 @@
 
 ## API Link
 
-To access the Board Game API, visit `https://mels-games.herokuapp.com/api`
+To access the Board Game API, visit `https://mels-board-games-api.herokuapp.com/api`
 
 ## API Description
 
