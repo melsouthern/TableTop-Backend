@@ -51,9 +51,9 @@ exports.checkReviewIdExists = async (review_id) => {
   return result.rows.length !== 0;
 };
 
-exports.checkReviewIdDataType = (review_id) => {
+exports.checkIfNum = (data) => {
   const regex = /^\d+$/;
-  return regex.test(review_id);
+  return regex.test(data);
 };
 
 exports.checkColumnExists = (sort_by) => {
@@ -92,4 +92,12 @@ exports.checkCategoryExists = async (category) => {
     return checkCategory;
   }
   return false;
+};
+
+exports.checkCommentIdExists = async (comment_id) => {
+  const result = await db.query(
+    "SELECT * FROM comments WHERE comment_id = $1;",
+    [comment_id]
+  );
+  return result.rows.length !== 0;
 };

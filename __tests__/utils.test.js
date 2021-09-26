@@ -4,10 +4,11 @@ const {
   formatReviewDataToNested,
   formatCommentDataToNested,
   checkReviewIdExists,
-  checkReviewIdDataType,
+  checkIfNum,
   checkColumnExists,
   checkOrderSpecifier,
   checkCategoryExists,
+  checkCommentIdExists,
 } = require("../db/utils/data-manipulation");
 
 const testData = require("../db/data/test-data/index.js");
@@ -483,25 +484,25 @@ describe("checkReviewIdExists", () => {
   });
 });
 
-describe("checkReviewIdDataType", () => {
+describe("checkIfNum", () => {
   it("should return either true or false when passed a variable", async () => {
-    const testingFalse = await checkReviewIdDataType("cats");
+    const testingFalse = await checkIfNum("cats");
     expect(testingFalse).toBe(false);
-    const testingTrue = await checkReviewIdDataType(34);
+    const testingTrue = await checkIfNum(34);
     expect(testingTrue).toBe(true);
   });
   it("should return true if only digits are present in review_id argument", async () => {
-    const testingTrue2789 = await checkReviewIdDataType(2789);
+    const testingTrue2789 = await checkIfNum(2789);
     expect(testingTrue2789).toBe(true);
-    const testingTrue54 = await checkReviewIdDataType(54);
+    const testingTrue54 = await checkIfNum(54);
     expect(testingTrue54).toBe(true);
   });
   it("should return false if the data type passed in through the review_id argument is not composed of only digits", async () => {
-    const testingFalseString = await checkReviewIdDataType("cats");
+    const testingFalseString = await checkIfNum("cats");
     expect(testingFalseString).toBe(false);
-    const testingFalseSpecialChar = await checkReviewIdDataType("!$%");
+    const testingFalseSpecialChar = await checkIfNum("!$%");
     expect(testingFalseSpecialChar).toBe(false);
-    const testingNumStringMix = await checkReviewIdDataType("3647tH");
+    const testingNumStringMix = await checkIfNum("3647tH");
     expect(testingNumStringMix).toBe(false);
   });
 });
@@ -570,5 +571,28 @@ describe("checkCategoryExists", () => {
     expect(testingDexterity).toBe("dexterity");
     const testingEuroGame = await checkCategoryExists("euro_game");
     expect(testingEuroGame).toBe("euro game");
+  });
+});
+
+describe("checkCommentIdExists", () => {
+  it("should return either true or false when passed a number", async () => {
+    const result = await checkCommentIdExists(1);
+    expect(result).toBe(true);
+  });
+  it("should return true when the comment_id passed in as an argument exists in the comments table", async () => {
+    const trueTest1 = await checkCommentIdExists(4);
+    expect(trueTest1).toBe(true);
+    const trueTest3 = await checkCommentIdExists(3);
+    expect(trueTest3).toBe(true);
+    const trueTest7 = await checkCommentIdExists(5);
+    expect(trueTest7).toBe(true);
+  });
+  it("should return false when the comment_id passed in as an argument does not exist in the comments table", async () => {
+    const falseTest987 = await checkCommentIdExists(987);
+    expect(falseTest987).toBe(false);
+    const falseTest1238 = await checkCommentIdExists(1238);
+    expect(falseTest1238).toBe(false);
+    const falseTest456 = await checkCommentIdExists(456);
+    expect(falseTest456).toBe(false);
   });
 });

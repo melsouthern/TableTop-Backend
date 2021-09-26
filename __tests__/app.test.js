@@ -64,7 +64,7 @@ describe("GET /api/reviews/:review_id", () => {
     const result = await request(app).get("/api/reeviews/10").expect(404);
     expect(result.body.msg).toBe("Invalid URL - incorrect path provided");
   });
-  test("404: responds with error message if review id number not found", async () => {
+  test("404: responds with error message if review_id number not found", async () => {
     const result = await request(app).get("/api/reviews/1000").expect(404);
     expect(result.body.msg).toBe(
       "Not Found - review_id provided is non-existent"
@@ -138,7 +138,7 @@ describe("PATCH /api/reviews/:review_id", () => {
       .expect(404);
     expect(result.body.msg).toBe("Invalid URL - incorrect path provided");
   });
-  test("404: responds with error message if review id number not found", async () => {
+  test("404: responds with error message if review_id number not found", async () => {
     const result = await request(app)
       .patch("/api/reviews/99999")
       .send({ inc_votes: 3 })
@@ -410,7 +410,7 @@ describe("GET /api/reviews/:review_id/comments", () => {
       .expect(404);
     expect(result.body.msg).toBe("Invalid URL - incorrect path provided");
   });
-  test("404: responds with error message if review id number not found", async () => {
+  test("404: responds with error message if review_id number not found", async () => {
     const result = await request(app)
       .get("/api/reviews/99999/comments")
       .expect(404);
@@ -475,7 +475,7 @@ describe("POST /api/reviews/:review_id/comments", () => {
       .expect(404);
     expect(result.body.msg).toBe("Invalid URL - incorrect path provided");
   });
-  test("404: responds with error message if review id number not found", async () => {
+  test("404: responds with error message if review_id number not found", async () => {
     const result = await request(app)
       .post("/api/reviews/900000/comments")
       .send({ username: "dav3rid", body: "my cat loves this game!" })
@@ -526,6 +526,51 @@ describe("POST /api/reviews/:review_id/comments", () => {
       .expect(400);
     expect(result.body.msg).toBe(
       "Bad Request - incorrect format of post request"
+    );
+  });
+});
+
+describe("DELETE /api/comments/comment_id", () => {
+  test('204: successfully removes the specific comment and provides message "No Content"', async () => {
+    const result = await request(app).delete("/api/comments/4").expect(204);
+    expect(result.status).toBe(204);
+    const dbCheck = await db.query(
+      "SELECT * FROM comments WHERE comment_id = 4;"
+    );
+    expect(dbCheck.rows.length).toEqual(0);
+  });
+  test("404: responds with error message if comments spelled incorrectly", async () => {
+    const result = await request(app).delete("/api/commeents/4").expect(404);
+    expect(result.body.msg).toBe("Invalid URL - incorrect path provided");
+  });
+  test("404: responds with error message if api spelled incorrectly", async () => {
+    const result = await request(app).delete("/aip/comments/4").expect(404);
+    expect(result.body.msg).toBe("Invalid URL - incorrect path provided");
+  });
+  test("400: responds with error message if incorrect data type provided as the comment_id", async () => {
+    const stringResult = await request(app)
+      .delete("/api/comments/cats")
+      .expect(400);
+    expect(stringResult.body.msg).toBe(
+      "Invalid Data Type - comment_id provided is not an authorised input"
+    );
+    const specialCharResult = await request(app)
+      .delete("/api/comments/!&$£")
+      .expect(400);
+    expect(specialCharResult.body.msg).toBe(
+      "Invalid Data Type - comment_id provided is not an authorised input"
+    );
+    const numAndStringResult = await request(app)
+      .delete("/api/comments/m30w")
+      .expect(400);
+    expect(numAndStringResult.body.msg).toBe(
+      "Invalid Data Type - comment_id provided is not an authorised input"
+    );
+  });
+  test("404: responds with error message if comment_id number not found", async () => {
+    const result = await request(app).delete("/api/comments/9999").expect(404);
+    expect(result.body.msg).toBe(
+      "Not Found - comment_id provided is non-existent"
     );
   });
 });

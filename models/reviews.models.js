@@ -1,14 +1,14 @@
 const db = require("../db/connection");
 const {
   checkReviewIdExists,
-  checkReviewIdDataType,
+  checkIfNum,
   checkColumnExists,
   checkOrderSpecifier,
   checkCategoryExists,
 } = require("../db/utils/data-manipulation");
 
 exports.fetchSpecificReview = async (review_id) => {
-  const checkedDataType = await checkReviewIdDataType(review_id);
+  const checkedDataType = await checkIfNum(review_id);
   if (!checkedDataType) {
     return Promise.reject({
       status: 400,
@@ -33,7 +33,7 @@ exports.fetchSpecificReview = async (review_id) => {
 };
 
 exports.tweakSpecificReview = async (review_id, inc_votes) => {
-  const checkedDataType = await checkReviewIdDataType(review_id);
+  const checkedDataType = await checkIfNum(review_id);
   if (!checkedDataType) {
     return Promise.reject({
       status: 400,
@@ -102,7 +102,7 @@ exports.fetchReviews = async (
 };
 
 exports.fetchSpecificReviewComments = async (review_id) => {
-  const checkedDataType = await checkReviewIdDataType(review_id);
+  const checkedDataType = await checkIfNum(review_id);
   if (!checkedDataType) {
     return Promise.reject({
       status: 400,
@@ -127,7 +127,7 @@ exports.fetchSpecificReviewComments = async (review_id) => {
 };
 
 exports.publishComment = async (review_id, username, body) => {
-  const checkedDataType = await checkReviewIdDataType(review_id);
+  const checkedDataType = await checkIfNum(review_id);
   if (!checkedDataType) {
     return Promise.reject({
       status: 400,
