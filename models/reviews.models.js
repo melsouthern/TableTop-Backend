@@ -147,5 +147,6 @@ exports.publishComment = async (review_id, username, body) => {
     `INSERT INTO comments (review_id, author, body) VALUES ($1, $2, $3) RETURNING comment_id, votes, created_at, author, body;`,
     [review_id, username, body]
   );
-  return result.rows;
+
+  return result.rows[0];
 };

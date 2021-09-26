@@ -440,7 +440,7 @@ describe("POST /api/reviews/:review_id/comments", () => {
       .post("/api/reviews/2/comments")
       .send({ username: "dav3rid", body: "my cat loves this game!" })
       .expect(201);
-    expect(result.body.comment[0]).toMatchObject({
+    expect(result.body.comment).toMatchObject({
       comment_id: expect.any(Number),
       votes: 0,
       created_at: expect.any(String),

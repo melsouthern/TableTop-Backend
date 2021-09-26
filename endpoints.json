@@ -32,23 +32,21 @@
     }
   },
   "GET /api/reviews/:review_id": {
-    "description": "responds with the specific reviews associated with provided review_id",
+    "description": "responds with the specific review associated with provided review_id",
     "queries": [],
     "exampleResponse": {
-      "review": [
-        {
-          "title": "Agricola",
-          "designer": "Uwe Rosenberg",
-          "owner": "mallionaire",
-          "review_img_url": "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
-          "category": "euro game",
-          "created_at": 1610964020514,
-          "votes": 1,
-          "review_id": 1,
-          "review_body": "Farmyard fun!",
-          "comment_count": 0
-        }
-      ]
+      "review": {
+        "title": "Agricola",
+        "designer": "Uwe Rosenberg",
+        "owner": "mallionaire",
+        "review_img_url": "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+        "category": "euro game",
+        "created_at": 1610964020514,
+        "votes": 1,
+        "review_id": 1,
+        "review_body": "Farmyard fun!",
+        "comment_count": 0
+      }
     }
   },
   "PATCH /api/reviews/:review_id": {
@@ -56,20 +54,18 @@
     "queries": [],
     "exampleRequest": { "inc_votes": 6 },
     "exampleResponse": {
-      "review": [
-        {
-          "title": "Agricola",
-          "designer": "Uwe Rosenberg",
-          "owner": "mallionaire",
-          "review_img_url": "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
-          "category": "euro game",
-          "created_at": 1610964020514,
-          "votes": 7,
-          "review_id": 1,
-          "review_body": "Farmyard fun!",
-          "comment_count": 0
-        }
-      ]
+      "review": {
+        "title": "Agricola",
+        "designer": "Uwe Rosenberg",
+        "owner": "mallionaire",
+        "review_img_url": "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+        "category": "euro game",
+        "created_at": 1610964020514,
+        "votes": 7,
+        "review_id": 1,
+        "review_body": "Farmyard fun!",
+        "comment_count": 0
+      }
     }
   },
   "GET /api/reviews/:review_id/comments": {
@@ -95,15 +91,55 @@
       "body": "my cat loves this game!"
     },
     "exampleResponse": {
-      "comment": [
+      "comment": {
+        "comment_id": 10,
+        "votes": 0,
+        "created_at": 1610964020514,
+        "body": "my cat loves this game!",
+        "author": "dav3rid"
+      }
+    }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "deletes the given comment by comment_id",
+    "queries": [],
+    "exampleResponse": "Not applicable for DELETE request"
+  },
+  "GET /api/users": {
+    "description": "responds with an array of objects which should each have a username property",
+    "queries": [],
+    "exampleResponse": {
+      "users": [
         {
-          "comment_id": 10,
-          "votes": 0,
-          "created_at": 1610964020514,
-          "body": "my cat loves this game!",
-          "author": "dav3rid"
+          "username": "mallionaire"
         }
       ]
+    }
+  },
+  "GET /api/users/:username": {
+    "description": "responds with the user object for the relevant username provided",
+    "queries": [],
+    "exampleResponse": {
+      "user": {
+        "username": "dav3rid",
+        "name": "dave",
+        "avatar_url": "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png"
+      }
+    }
+  },
+  "PATCH /api/comments/:comment_id": {
+    "description": "accepts an object in the form { inc_votes: newVote }. If newVote is a positive integer, the votes property in the given comment_id will be increased by newVote value. If newVote is a negative integer, the votes property in the given comment_id will be decreased by newVote value. The patched object will then be returned",
+    "queries": [],
+    "exampleRequest": { "inc_votes": 3 },
+    "exampleResponse": {
+      "comment": {
+        "comment_id": 3,
+        "author": "philippaclaire9",
+        "review_id": 3,
+        "votes": 13,
+        "created_at": "2021-01-18T10:09:48.110Z",
+        "body": "I didn't know dogs could play games"
+      }
     }
   }
 }

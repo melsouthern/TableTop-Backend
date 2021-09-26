@@ -50,3 +50,19 @@ These files should sit in a .gitignore file. The purpose of these files are to s
 - `npm test` - This action is used for testing the functionality by using the test database. Whenever this action is run, the databases will be setup and it will seed the test data. Every time this command is ran, the test data is refreshed.
 
 ---
+
+## Endpoint Summary
+
+- `GET /api` - serves up a json representation of all the available endpoints of the api
+- `GET /api/categories` - serves an array of all board game categories
+- `GET /api/reviews` - serves an array of all reviews for the board games
+- `GET /api/reviews/:review_id` - responds with the specific review associated with the provided review_id and can be used in conjunction with category, sort_by and order queries
+- `PATCH /api/reviews/:review_id` - accepts an object in the form { inc_votes: newVote }. If newVote is a positive integer, the votes property in the given review_id will be increased by newVote value. If newVote is a negative integer, the votes property in the given review_id will be decreased by newVote value. The patched object will then be returned in the response
+- `GET /api/reviews/:review_id/comments` - responds with an array of comments associated with the provided review_id
+- `POST /api/reviews/:review_id/comments` - accepts an object in the form { username: username, body: body } and returns the newly added comment
+- `DELETE /api/comments/:comment_id` - deletes the given comment by comment_id
+- `GET /api/users` - responds with an array of objects which should each have a username property
+- `GET /api/users/:username` - responds with the user object for the relevant username provided
+- `PATCH /api/comments/:comment_id` - accepts an object in the form { inc_votes: newVote }. If newVote is a positive integer, the votes property in the given comment_id will be increased by newVote value. If newVote is a negative integer, the votes property in the given comment_id will be decreased by newVote value. The patched object will then be returned
+
+For a more detailed summary of the endpoints, please visit `https://mels-board-games-api.herokuapp.com/api`.
