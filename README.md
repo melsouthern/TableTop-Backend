@@ -281,10 +281,11 @@ Responds with:
 
 Responds with:
 
-- a user object which should have the following properties:
-  - `username`
-  - `avatar_url`
-  - `name`
+a user object which should have the following properties:
+
+- `username`
+- `avatar_url`
+- `name`
 
 ---
 

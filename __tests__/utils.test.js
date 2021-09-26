@@ -4,7 +4,17 @@ const {
   formatReviewDataToNested,
   formatCommentDataToNested,
   checkReviewIdExists,
+  checkReviewIdDataType,
+  checkColumnExists,
+  checkOrderSpecifier,
+  checkCategoryExists,
 } = require("../db/utils/data-manipulation");
+
+const testData = require("../db/data/test-data/index.js");
+const seed = require("../db/seeds/seed.js");
+const db = require("../db/connection.js");
+beforeEach(() => seed(testData));
+afterAll(() => db.end());
 
 describe("formatCategoryDataToNested", () => {
   it("should return an empty array when passed empty array", () => {
@@ -447,5 +457,118 @@ describe("formatCommentDataToNested", () => {
     expect(formatCommentDataToNested(input)).not.toBe(input);
     formatCommentDataToNested(input);
     expect(input).toEqual(input);
+  });
+});
+
+describe("checkReviewIdExists", () => {
+  it("should return either true or false when passed a number", async () => {
+    const result = await checkReviewIdExists(9);
+    expect(result).toBe(true);
+  });
+  it("should return true when the review_id passed in as an argument exists in the reviews table", async () => {
+    const trueTest1 = await checkReviewIdExists(1);
+    expect(trueTest1).toBe(true);
+    const trueTest3 = await checkReviewIdExists(3);
+    expect(trueTest3).toBe(true);
+    const trueTest7 = await checkReviewIdExists(7);
+    expect(trueTest7).toBe(true);
+  });
+  it("should return false when the review_id passed in as an argument does not exist in the reviews table", async () => {
+    const falseTest987 = await checkReviewIdExists(987);
+    expect(falseTest987).toBe(false);
+    const falseTest1238 = await checkReviewIdExists(1238);
+    expect(falseTest1238).toBe(false);
+    const falseTest456 = await checkReviewIdExists(456);
+    expect(falseTest456).toBe(false);
+  });
+});
+
+describe("checkReviewIdDataType", () => {
+  it("should return either true or false when passed a variable", async () => {
+    const testingFalse = await checkReviewIdDataType("cats");
+    expect(testingFalse).toBe(false);
+    const testingTrue = await checkReviewIdDataType(34);
+    expect(testingTrue).toBe(true);
+  });
+  it("should return true if only digits are present in review_id argument", async () => {
+    const testingTrue2789 = await checkReviewIdDataType(2789);
+    expect(testingTrue2789).toBe(true);
+    const testingTrue54 = await checkReviewIdDataType(54);
+    expect(testingTrue54).toBe(true);
+  });
+  it("should return false if the data type passed in through the review_id argument is not composed of only digits", async () => {
+    const testingFalseString = await checkReviewIdDataType("cats");
+    expect(testingFalseString).toBe(false);
+    const testingFalseSpecialChar = await checkReviewIdDataType("!$%");
+    expect(testingFalseSpecialChar).toBe(false);
+    const testingNumStringMix = await checkReviewIdDataType("3647tH");
+    expect(testingNumStringMix).toBe(false);
+  });
+});
+
+describe("checkColumnExists", () => {
+  it("should return either true or false when passed a variable", async () => {
+    const testingFalse = await checkColumnExists("cats");
+    expect(testingFalse).toBe(false);
+    const testingTrue = await checkColumnExists("votes");
+    expect(testingTrue).toBe(true);
+  });
+  it("should return true if sort_by argument exists as a category", async () => {
+    const testingTitle = await checkColumnExists("title");
+    expect(testingTitle).toBe(true);
+    const testingComment_Count = await checkColumnExists("comment_count");
+    expect(testingComment_Count).toBe(true);
+  });
+  it("should return false if sort_by argument does not exist as a category", async () => {
+    const testingString = await checkColumnExists("comment count");
+    expect(testingString).toBe(false);
+    const testingNum = await checkColumnExists(647);
+    expect(testingNum).toBe(false);
+  });
+});
+
+describe("checkOrderSpecifier", () => {
+  it("should return either true or false when passed a variable", async () => {
+    const testingFalse = await checkOrderSpecifier("DDESCC");
+    expect(testingFalse).toBe(false);
+    const testingTrue = await checkOrderSpecifier("desc");
+    expect(testingTrue).toBe(true);
+  });
+  it("should return true if order argument passed matches DESC, desc, ASC or asc", async () => {
+    const testingDESC = await checkOrderSpecifier("DESC");
+    expect(testingDESC).toBe(true);
+    const testingDesc = await checkOrderSpecifier("desc");
+    expect(testingDesc).toBe(true);
+    const testingASC = await checkOrderSpecifier("ASC");
+    expect(testingASC).toBe(true);
+    const testingAsc = await checkOrderSpecifier("asc");
+    expect(testingAsc).toBe(true);
+  });
+  it("should return false if order argument passed does not match DESC, desc, ASC or asc", async () => {
+    const testingString = await checkOrderSpecifier("descending");
+    expect(testingString).toBe(false);
+    const testingNum = await checkOrderSpecifier(678);
+    expect(testingNum).toBe(false);
+  });
+});
+
+describe("checkCategoryExists", () => {
+  it("should return either false or the new amended value when passed a variable", async () => {
+    const testingFalse = await checkCategoryExists("cats");
+    expect(testingFalse).toBe(false);
+    const testingCorrectValue = await checkCategoryExists("social_deduction");
+    expect(testingCorrectValue).toBe("social deduction");
+  });
+  it("should return false when category argument passed is not a category in the reviews table", async () => {
+    const testingString = await checkCategoryExists("socialdeduction");
+    expect(testingString).toBe(false);
+    const testingNum = await checkCategoryExists(678);
+    expect(testingNum).toBe(false);
+  });
+  it("should return amended value when category argument passed is a category in the reviews table", async () => {
+    const testingDexterity = await checkCategoryExists("dexterity");
+    expect(testingDexterity).toBe("dexterity");
+    const testingEuroGame = await checkCategoryExists("euro_game");
+    expect(testingEuroGame).toBe("euro game");
   });
 });

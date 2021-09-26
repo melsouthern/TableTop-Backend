@@ -70,13 +70,20 @@ exports.checkColumnExists = (sort_by) => {
 };
 
 exports.checkOrderSpecifier = (order) => {
-  const orderCopy = order.toUpperCase();
-  return orderCopy === "DESC" || orderCopy === "ASC";
+  if (typeof order === "string" || order instanceof String) {
+    const orderCopy = order.toUpperCase();
+    return orderCopy === "DESC" || orderCopy === "ASC";
+  } else {
+    return false;
+  }
 };
 
 exports.checkCategoryExists = async (category) => {
+  if (typeof category !== "string") {
+    return false;
+  }
   const checkCategory = category.split("_").join(" ");
-  let result = await db.query(`SELECT reviews.category FROM reviews;`);
+  const result = await db.query(`SELECT reviews.category FROM reviews;`);
   const checker = result.rows.filter((row) => {
     return row.category === checkCategory;
   });
