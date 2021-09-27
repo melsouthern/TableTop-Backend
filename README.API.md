@@ -6,7 +6,7 @@ To access the Board Game API, visit `https://mels-board-games-api.herokuapp.com/
 
 ## API Description
 
-This API is centred around board games and based on the requests provided (GET, PATCH, POST), this API will respond with various data in an array format, such as game category data, review data, comment data and user data.
+This API is centred around board games and based on the requests provided (GET, PATCH, POST, DELETE), this API will respond with various data in an array format, such as game category data, review data, comment data and user data.
 
 This API has been developed with the following:
 

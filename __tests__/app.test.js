@@ -68,7 +68,7 @@ describe("GET /api/reviews/:review_id", () => {
       "Not Found - review_id provided is non-existent"
     );
   });
-  test("400: responds with error message if incorrect data type provided as the review_id ", async () => {
+  test("400: responds with error message if incorrect data type provided as the review_id", async () => {
     const stringResult = await request(app)
       .get("/api/reviews/cats")
       .expect(400);
@@ -91,7 +91,7 @@ describe("GET /api/reviews/:review_id", () => {
 });
 
 describe("PATCH /api/reviews/:review_id", () => {
-  test("200: tweaks the votes property by either incrementing or decrementing the value, then responds with the updated review ", async () => {
+  test("200: tweaks the votes property by either incrementing or decrementing the value, then responds with the updated review", async () => {
     const positiveNumResult = await request(app)
       .patch("/api/reviews/3")
       .send({ inc_votes: 3 })
