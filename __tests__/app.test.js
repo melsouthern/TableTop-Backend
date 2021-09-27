@@ -200,7 +200,7 @@ describe("GET /api/reviews", () => {
     const result = await request(app).get("/aip/reviews").expect(404);
     expect(result.body.msg).toBe("Invalid URL - incorrect path provided");
   });
-  test("200: accepts sort_by query and sort reviews by column defined", async () => {
+  test("200: accepts sort_by query and sorts reviews by column defined", async () => {
     const ownerResult = await request(app)
       .get("/api/reviews?sort_by=owner")
       .expect(200);
