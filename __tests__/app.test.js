@@ -688,3 +688,103 @@ describe("PATCH /api/comments/:comment_id", () => {
     );
   });
 });
+
+describe("POST /api/reviews", () => {
+  test("201: responds with the posted comment", async () => {
+    const result = await request(app)
+      .post("/api/reviews")
+      .send({
+        owner: "dav3rid",
+        title: "Kerplunk; Don't lose your marbles",
+        review_body: "lost my marbles on this game every time",
+        designer: "Avery Wunzboogerz",
+        category: "dexterity",
+      })
+      .expect(201);
+    expect(result.body.review).toMatchObject({
+      owner: "dav3rid",
+      title: "Kerplunk; Don't lose your marbles",
+      review_body: "lost my marbles on this game every time",
+      designer: "Avery Wunzboogerz",
+      category: "dexterity",
+      review_id: expect.any(Number),
+      votes: 0,
+      created_at: expect.any(String),
+      comment_count: 0,
+    });
+  });
+  // test("404: responds with error message if reviews spelled incorrectly", async () => {
+  //   const result = await request(app)
+  //     .post("/api/revieews/9/comments")
+  //     .send({ username: "dav3rid", body: "my cat loves this game!" })
+  //     .expect(404);
+  //   expect(result.body.msg).toBe("Invalid URL - incorrect path provided");
+  // });
+  // test("404: responds with error message if comments spelled incorrectly", async () => {
+  //   const result = await request(app)
+  //     .post("/api/revieews/9/commeents")
+  //     .send({ username: "dav3rid", body: "my cat loves this game!" })
+  //     .expect(404);
+  //   expect(result.body.msg).toBe("Invalid URL - incorrect path provided");
+  // });
+  // test("404: responds with error message if api spelled incorrectly", async () => {
+  //   const result = await request(app)
+  //     .post("/aip/reviews/9/comments")
+  //     .send({ username: "dav3rid", body: "my cat loves this game!" })
+  //     .expect(404);
+  //   expect(result.body.msg).toBe("Invalid URL - incorrect path provided");
+  // });
+  // test("404: responds with error message if review_id number not found", async () => {
+  //   const result = await request(app)
+  //     .post("/api/reviews/900000/comments")
+  //     .send({ username: "dav3rid", body: "my cat loves this game!" })
+  //     .expect(404);
+  //   expect(result.body.msg).toBe(
+  //     "Not Found - review_id provided is non-existent"
+  //   );
+  // });
+  // test("400: responds with error message if incorrect data type provided as the review_id", async () => {
+  //   const stringResult = await request(app)
+  //     .post("/api/reviews/cats/comments")
+  //     .send({ username: "dav3rid", body: "my cat loves this game!" })
+  //     .expect(400);
+  //   expect(stringResult.body.msg).toBe(
+  //     "Invalid Data Type - review_id provided is not an authorised input"
+  //   );
+  //   const specialCharResult = await request(app)
+  //     .post("/api/reviews/!!!/comments")
+  //     .send({ username: "dav3rid", body: "my cat loves this game!" })
+  //     .expect(400);
+  //   expect(specialCharResult.body.msg).toBe(
+  //     "Invalid Data Type - review_id provided is not an authorised input"
+  //   );
+  //   const numAndStringResult = await request(app)
+  //     .post("/api/reviews/me3330w/comments")
+  //     .send({ username: "dav3rid", body: "my cat loves this game!" })
+  //     .expect(400);
+  //   expect(numAndStringResult.body.msg).toBe(
+  //     "Invalid Data Type - review_id provided is not an authorised input"
+  //   );
+  // });
+  // test("404: responds with error message if user provided does not exist", async () => {
+  //   const result = await request(app)
+  //     .post("/api/reviews/2/comments")
+  //     .send({
+  //       username: "catLady400",
+  //       body: "My 24 cats love to chew on the blocks",
+  //     })
+  //     .expect(404);
+  //   expect(result.body.msg).toBe(
+  //     "Not Found - username provided in post request is non-existent"
+  //   );
+  // });
+  // test("400: responds with error message if post content is provided in wrong format", async () => {
+  //   const result = await request(app)
+  //     .post("/api/reviews/2/comments")
+  //     .send({ user: "dav3rid", bod: "my cat loves this game!" })
+  //     .expect(400);
+  //   expect(result.body.msg).toBe(
+  //     "Bad Request - incorrect format of post request"
+  //   );
+  // });
+});

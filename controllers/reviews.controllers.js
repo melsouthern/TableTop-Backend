@@ -4,6 +4,7 @@ const {
   fetchReviews,
   fetchSpecificReviewComments,
   publishComment,
+  publishReview,
 } = require("../models/reviews.models");
 
 exports.getSpecificReview = async (req, res, next) => {
@@ -76,6 +77,37 @@ exports.postComment = async (req, res, next) => {
     const { username, body } = req.body;
     const result = await publishComment(review_id, username, body);
     res.status(201).send({ comment: result });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.postReview = async (req, res, next) => {
+  try {
+    if (
+      Object.keys(req.body).length < 5 ||
+      Object.keys(req.body).length > 5 ||
+      req.body.hasOwnProperty("owner") === false ||
+      req.body.hasOwnProperty("title") === false ||
+      req.body.hasOwnProperty("review_body") === false ||
+      req.body.hasOwnProperty("designer") === false ||
+      req.body.hasOwnProperty("category") === false
+    ) {
+      await Promise.reject({
+        status: 400,
+        msg: "Bad Request - incorrect format of post request",
+      });
+    }
+
+    const { owner, title, review_body, designer, category } = req.body;
+    const result = await publishReview(
+      owner,
+      title,
+      review_body,
+      designer,
+      category
+    );
+    res.status(201).send({ review: result });
   } catch (err) {
     next(err);
   }

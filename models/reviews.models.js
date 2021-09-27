@@ -150,3 +150,25 @@ exports.publishComment = async (review_id, username, body) => {
 
   return result.rows[0];
 };
+
+// exports.publishReview = async (
+//   owner,
+//   title,
+//   review_body,
+//   designer,
+//   category
+// ) => {
+//   const insertInto = await db.query(
+//     `INSERT INTO reviews (owner, title, review_body, designer, category) VALUES ($1, $2, $3, $4, $5);`,
+//     [owner, title, review_body, designer, category]
+//   );
+
+//   const result = await db.query(
+//     `SELECT * FROM reviews, COUNT(comments.review_id) AS comment_count FROM reviews WHERE review_id = 2 LEFT JOIN comments ON comments.review_id = reviews.review_id`
+//   );
+//   console.log(result.rows);
+
+//   return result.rows[0];
+// };
+
+// [insertInto.rows[0].review_id]

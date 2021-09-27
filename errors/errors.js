@@ -8,11 +8,9 @@ exports.customErrors = (err, req, res, next) => {
 
 exports.notAUserError = (err, req, res, next) => {
   if (err.code === "23503") {
-    res
-      .status(404)
-      .send({
-        msg: "Not Found - username provided in post request is non-existent",
-      });
+    res.status(404).send({
+      msg: "Not Found - username provided in post request is non-existent",
+    });
   } else {
     next(err);
   }
