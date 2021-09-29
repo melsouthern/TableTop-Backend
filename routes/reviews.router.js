@@ -7,14 +7,18 @@ const {
   postComment,
   postReview,
 } = require("../controllers/reviews.controllers");
-const reviews = require("../db/data/test-data/reviews");
 const reviewsRouter = express.Router();
 
-reviewsRouter.get("/", getReviews);
-reviewsRouter.post("/", postReview);
-reviewsRouter.get("/:review_id", getSpecificReview);
-reviewsRouter.patch("/:review_id", patchSpecificReview);
-reviewsRouter.get("/:review_id/comments", getSpecificReviewComments);
-reviewsRouter.post("/:review_id/comments", postComment);
+reviewsRouter.route("/").get(getReviews);
+
+reviewsRouter
+  .route("/:review_id")
+  .get(getSpecificReview)
+  .patch(patchSpecificReview);
+
+reviewsRouter
+  .route("/:review_id/comments")
+  .get(getSpecificReviewComments)
+  .post(postComment);
 
 module.exports = reviewsRouter;

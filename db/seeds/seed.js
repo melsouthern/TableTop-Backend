@@ -46,7 +46,7 @@ const seed = async (data) => {
   CREATE TABLE comments (
     comment_id SERIAL PRIMARY KEY,
     author VARCHAR(150) REFERENCES users(username),
-    review_id INT REFERENCES reviews(review_id),
+    review_id INT REFERENCES reviews(review_id) ON DELETE CASCADE,
     votes INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     body VARCHAR(500) NOT NULL
@@ -91,9 +91,6 @@ const seed = async (data) => {
     formattedCommentData
   );
   await db.query(commentQuery);
-
-  // 1. create tables
-  // 2. insert data
 };
 
 module.exports = seed;

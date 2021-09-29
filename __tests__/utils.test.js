@@ -4,7 +4,6 @@ const {
   formatReviewDataToNested,
   formatCommentDataToNested,
   checkReviewIdExists,
-  checkIfNum,
   checkColumnExists,
   checkOrderSpecifier,
   checkCategoryExists,
@@ -90,7 +89,28 @@ describe("formatCategoryDataToNested", () => {
     ];
     expect(formatCategoryDataToNested(input)).not.toBe(input);
     formatCategoryDataToNested(input);
-    expect(input).toEqual(input);
+    expect(input).toEqual([
+      {
+        slug: "strategy",
+        description:
+          "Strategy-focused board games that prioritise limited-randomness",
+      },
+      {
+        slug: "hidden-roles",
+        description:
+          "One or more players around the table have a secret, and the rest of you need to figure out who! Players attempt to uncover each other's hidden role",
+      },
+      {
+        slug: "dexterity",
+        description:
+          "Games involving physical skill, something like Gladiators, for Board Games!",
+      },
+      {
+        slug: "push-your-luck",
+        description:
+          "Games that allow you to take bigger risks to achieve increasingly valuable rewards - or to decide to keep what you’ve got before you lose everything.",
+      },
+    ]);
   });
 });
 
@@ -172,7 +192,31 @@ describe("formatUserDataToNested", () => {
     ];
     expect(formatUserDataToNested(input)).not.toBe(input);
     formatUserDataToNested(input);
-    expect(input).toEqual(input);
+    expect(input).toEqual([
+      {
+        username: "tickle122",
+        name: "Tom Tickle",
+        avatar_url:
+          "https://www.spiritsurfers.net/monastery/wp-content/uploads/_41500270_mrtickle.jpg",
+      },
+      {
+        username: "grumpy19",
+        name: "Paul Grump",
+        avatar_url:
+          "https://www.tumbit.com/profile-image/4/original/mr-grumpy.jpg",
+      },
+      {
+        username: "happyamy2016",
+        name: "Amy Happy",
+        avatar_url:
+          "https://vignette1.wikia.nocookie.net/mrmen/images/7/7f/Mr_Happy.jpg/revision/latest?cb=20140102171729",
+      },
+      {
+        username: "cooljmessy",
+        name: "Peter Messy",
+        avatar_url: "https://i.imgur.com/WfX0Neu.jpg",
+      },
+    ]);
   });
 });
 
@@ -360,7 +404,67 @@ describe("formatReviewDataToNested", () => {
     ];
     expect(formatReviewDataToNested(input)).not.toBe(input);
     formatReviewDataToNested(input);
-    expect(input).toEqual(input);
+    expect(input).toEqual([
+      {
+        title: "Culture a Love of Agriculture With Agricola",
+        designer: "Uwe Rosenberg",
+        owner: "tickle122",
+        review_img_url:
+          "https://images.pexels.com/photos/4917821/pexels-photo-4917821.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
+        review_body:
+          "You could sum up Agricola with the simple phrase 'Farmyeard Fun' but the mechanics and game play add so much more than that. You'll find yourself torn between breeding pigs, or sowing crops. Its joyeous and rewarding and it makes you think of time spent outside, which is much harder to do these days!",
+        category: "strategy",
+        created_at: new Date(1610964020514),
+        votes: 1,
+      },
+      {
+        title: "JengARRGGGH!",
+        designer: "Leslie Scott",
+        owner: "grumpy19",
+        review_img_url:
+          "https://images.pexels.com/photos/4009761/pexels-photo-4009761.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260",
+        review_body:
+          "Few games are equiped to fill a player with such a defined sense of mild-peril, but a friendly game of Jenga will turn the mustn't-make-it-fall anxiety all the way up to 11! Fiddly fun for all the family, this game needs little explaination. Whether you're a player who chooses to play it safe, or one who lives life on the edge, eventually the removal of blocks will destabilise the tower and all your Jenga dreams come tumbling down.",
+        category: "dexterity",
+        created_at: new Date(1610964101251),
+        votes: 5,
+      },
+      {
+        title: "Karma Karma Chameleon",
+        designer: "Rikki Tahta",
+        owner: "happyamy2016",
+        review_img_url:
+          "https://images.pexels.com/photos/5350049/pexels-photo-5350049.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
+        review_body:
+          "Try to trick your friends. If you find yourself being dealt the Chamelean card then the aim of the game is simple; blend in... Meanwhile the other players aim to be as vague as they can to not give the game away ",
+        category: "hidden-roles",
+        created_at: new Date(1610964102151),
+        votes: 5,
+      },
+      {
+        title: "One Night Ultimate Werewolf",
+        designer: "Akihisa Okui",
+        owner: "happyamy2016",
+        review_img_url:
+          "https://images.pexels.com/photos/5350049/pexels-photo-5350049.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
+        review_body: "We couldn't find the werewolf!",
+        category: "hidden-roles",
+        created_at: new Date(1610964101251),
+        votes: 5,
+      },
+      {
+        title: "A truly Quacking Game; Quacks of Quedlinburg",
+        designer: "Wolfgang Warsch",
+        owner: "happyamy2016",
+        review_img_url:
+          "https://images.pexels.com/photos/163064/play-stone-network-networked-interactive-163064.jpeg",
+        review_body:
+          "Ever wish you could try your hand at mixing potions? Quacks of Quedlinburg will have you mixing up a homebrew like no other. Each player buys different ingredients (chips) that are drawn at random to reach the most points, but watch out, you'd better not let your cauldrom explode.",
+        category: "push-your-luck",
+        created_at: new Date(1610964101251),
+        votes: 10,
+      },
+    ]);
   });
 });
 
@@ -458,7 +562,36 @@ describe("formatCommentDataToNested", () => {
     ];
     expect(formatCommentDataToNested(input)).not.toBe(input);
     formatCommentDataToNested(input);
-    expect(input).toEqual(input);
+    expect(input).toEqual([
+      {
+        body: "I loved this game too!",
+        votes: 16,
+        author: "happyamy2016",
+        review_id: 2,
+        created_at: new Date(1511354163389),
+      },
+      {
+        body: "My dog loved this game too!",
+        votes: 3,
+        author: "tickle122",
+        review_id: 4,
+        created_at: new Date(1610964545410),
+      },
+      {
+        body: "I didn't know dogs could play games",
+        votes: 10,
+        author: "weegembump",
+        review_id: 4,
+        created_at: new Date(1610964588110),
+      },
+      {
+        body: "EPIC board game!",
+        votes: 16,
+        author: "tickle122",
+        review_id: 2,
+        created_at: new Date(1511354163389),
+      },
+    ]);
   });
 });
 
@@ -483,74 +616,56 @@ describe("checkReviewIdExists", () => {
     const falseTest456 = await checkReviewIdExists(456);
     expect(falseTest456).toBe(false);
   });
-});
-
-describe("checkIfNum", () => {
-  it("should return either true or false when passed a variable", async () => {
-    const testingFalse = await checkIfNum("cats");
-    expect(testingFalse).toBe(false);
-    const testingTrue = await checkIfNum(34);
-    expect(testingTrue).toBe(true);
-  });
-  it("should return true if only digits are present in review_id argument", async () => {
-    const testingTrue2789 = await checkIfNum(2789);
-    expect(testingTrue2789).toBe(true);
-    const testingTrue54 = await checkIfNum(54);
-    expect(testingTrue54).toBe(true);
-  });
-  it("should return false if the data type passed in through the review_id argument is not composed of only digits", async () => {
-    const testingFalseString = await checkIfNum("cats");
-    expect(testingFalseString).toBe(false);
-    const testingFalseSpecialChar = await checkIfNum("!$%");
-    expect(testingFalseSpecialChar).toBe(false);
-    const testingNumStringMix = await checkIfNum("3647tH");
-    expect(testingNumStringMix).toBe(false);
+  it("should not mutate the passed argument, and should return new output", async () => {
+    const input = 2;
+    const checkNewOutput = await checkReviewIdExists(input);
+    expect(checkNewOutput).not.toBe(input);
+    await checkReviewIdExists(input);
+    expect(input).toEqual(2);
   });
 });
 
 describe("checkColumnExists", () => {
-  it("should return either true or false when passed a variable", async () => {
-    const testingFalse = await checkColumnExists("cats");
-    expect(testingFalse).toBe(false);
-    const testingTrue = await checkColumnExists("votes");
-    expect(testingTrue).toBe(true);
+  it("should return either true or false when passed a variable", () => {
+    expect(checkColumnExists("cats")).toBe(false);
+    expect(checkColumnExists("votes")).toBe(true);
   });
-  it("should return true if sort_by argument exists as a category", async () => {
-    const testingTitle = await checkColumnExists("title");
-    expect(testingTitle).toBe(true);
-    const testingComment_Count = await checkColumnExists("comment_count");
-    expect(testingComment_Count).toBe(true);
+  it("should return true if sort_by argument exists as a category", () => {
+    expect(checkColumnExists("title")).toBe(true);
+    expect(checkColumnExists("comment_count")).toBe(true);
   });
-  it("should return false if sort_by argument does not exist as a category", async () => {
-    const testingString = await checkColumnExists("comment count");
-    expect(testingString).toBe(false);
-    const testingNum = await checkColumnExists(647);
-    expect(testingNum).toBe(false);
+  it("should return false if sort_by argument does not exist as a category", () => {
+    expect(checkColumnExists("comment count")).toBe(false);
+    expect(checkColumnExists(647)).toBe(false);
+  });
+  it("should not mutate the passed argument, and should return new output", () => {
+    const input = 27;
+    expect(checkColumnExists(input)).not.toBe(input);
+    checkColumnExists(input);
+    expect(input).toEqual(27);
   });
 });
 
 describe("checkOrderSpecifier", () => {
-  it("should return either true or false when passed a variable", async () => {
-    const testingFalse = await checkOrderSpecifier("DDESCC");
-    expect(testingFalse).toBe(false);
-    const testingTrue = await checkOrderSpecifier("desc");
-    expect(testingTrue).toBe(true);
+  it("should return either true or false when passed a variable", () => {
+    expect(checkOrderSpecifier("DDESCC")).toBe(false);
+    expect(checkOrderSpecifier("desc")).toBe(true);
   });
-  it("should return true if order argument passed matches DESC, desc, ASC or asc", async () => {
-    const testingDESC = await checkOrderSpecifier("DESC");
-    expect(testingDESC).toBe(true);
-    const testingDesc = await checkOrderSpecifier("desc");
-    expect(testingDesc).toBe(true);
-    const testingASC = await checkOrderSpecifier("ASC");
-    expect(testingASC).toBe(true);
-    const testingAsc = await checkOrderSpecifier("asc");
-    expect(testingAsc).toBe(true);
+  it("should return true if order argument passed matches DESC, desc, ASC or asc", () => {
+    expect(checkOrderSpecifier("DESC")).toBe(true);
+    expect(checkOrderSpecifier("desc")).toBe(true);
+    expect(checkOrderSpecifier("ASC")).toBe(true);
+    expect(checkOrderSpecifier("asc")).toBe(true);
   });
-  it("should return false if order argument passed does not match DESC, desc, ASC or asc", async () => {
-    const testingString = await checkOrderSpecifier("descending");
-    expect(testingString).toBe(false);
-    const testingNum = await checkOrderSpecifier(678);
-    expect(testingNum).toBe(false);
+  it("should return false if order argument passed does not match DESC, desc, ASC or asc", () => {
+    expect(checkOrderSpecifier("descending")).toBe(false);
+    expect(checkOrderSpecifier(678)).toBe(false);
+  });
+  it("should not mutate the passed argument, and should return new output", () => {
+    const input = "asc";
+    expect(checkOrderSpecifier(input)).not.toBe(input);
+    checkOrderSpecifier(input);
+    expect(input).toEqual("asc");
   });
 });
 
@@ -572,6 +687,13 @@ describe("checkCategoryExists", () => {
     expect(testingDexterity).toBe("dexterity");
     const testingEuroGame = await checkCategoryExists("euro_game");
     expect(testingEuroGame).toBe("euro game");
+  });
+  it("should not mutate the passed argument, and should return new output", async () => {
+    const input = "cats";
+    const checkNewOutput = await checkCategoryExists(input);
+    expect(checkNewOutput).not.toBe(input);
+    await checkCategoryExists(input);
+    expect(input).toEqual("cats");
   });
 });
 
@@ -596,6 +718,13 @@ describe("checkCommentIdExists", () => {
     const falseTest456 = await checkCommentIdExists(456);
     expect(falseTest456).toBe(false);
   });
+  it("should not mutate the passed argument, and should return new output", async () => {
+    const input = 980;
+    const checkNewOutput = await checkCommentIdExists(input);
+    expect(checkNewOutput).not.toBe(input);
+    await checkCommentIdExists(input);
+    expect(input).toEqual(980);
+  });
 });
 
 describe("checkUserExists", () => {
@@ -616,5 +745,12 @@ describe("checkUserExists", () => {
     expect(testingMallionaire).toBe(true);
     const testingEuroGame = await checkUserExists("bainesface");
     expect(testingEuroGame).toBe(true);
+  });
+  it("should not mutate the passed argument, and should return new output", async () => {
+    const input = "cats";
+    const checkNewOutput = await checkUserExists(input);
+    expect(checkNewOutput).not.toBe(input);
+    await checkUserExists(input);
+    expect(input).toEqual("cats");
   });
 });

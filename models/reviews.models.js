@@ -1,28 +1,18 @@
 const db = require("../db/connection");
 const {
   checkReviewIdExists,
-  checkIfNum,
   checkColumnExists,
   checkOrderSpecifier,
   checkCategoryExists,
 } = require("../db/utils/data-manipulation");
 
 exports.fetchSpecificReview = async (review_id) => {
-  const checkedDataType = await checkIfNum(review_id);
-  if (!checkedDataType) {
-    return Promise.reject({
-      status: 400,
-      msg: "Invalid Data Type - review_id provided is not an authorised input",
-    });
-  }
-
   const checkedId = await checkReviewIdExists(review_id);
   if (checkedId) {
     const result = await db.query(
       `SELECT reviews.*, COUNT(comments.review_id) AS comment_count FROM reviews LEFT JOIN comments ON comments.review_id = reviews.review_id WHERE reviews.review_id = $1 GROUP BY reviews.review_id;`,
       [review_id]
     );
-
     return result.rows[0];
   } else {
     return Promise.reject({
@@ -33,11 +23,10 @@ exports.fetchSpecificReview = async (review_id) => {
 };
 
 exports.tweakSpecificReview = async (review_id, inc_votes) => {
-  const checkedDataType = await checkIfNum(review_id);
-  if (!checkedDataType) {
+  if (!inc_votes) {
     return Promise.reject({
       status: 400,
-      msg: "Invalid Data Type - review_id provided is not an authorised input",
+      msg: "Bad Request - inc_votes has not been provided",
     });
   }
 
@@ -62,7 +51,7 @@ exports.fetchReviews = async (
   order = "DESC",
   category
 ) => {
-  const checkedSort = await checkColumnExists(sort_by);
+  const checkedSort = checkColumnExists(sort_by);
   if (!checkedSort) {
     return Promise.reject({
       status: 400,
@@ -70,7 +59,7 @@ exports.fetchReviews = async (
     });
   }
 
-  const checkedOrder = await checkOrderSpecifier(order);
+  const checkedOrder = checkOrderSpecifier(order);
   if (!checkedOrder) {
     return Promise.reject({
       status: 400,
@@ -85,12 +74,19 @@ exports.fetchReviews = async (
     if (!checkedCategory) {
       return Promise.reject({
         status: 400,
-        msg: "Bad Request - category statement is provided incorrectly",
+        msg: "Not Found - category provided is non-existent",
       });
     }
 
-    let queryStr = `SELECT reviews.title, reviews.review_id, reviews.review_img_url, reviews.votes, reviews.owner, reviews.category, reviews.created_at, COUNT(comments.review_id) AS comment_count FROM reviews LEFT JOIN comments ON comments.review_id = reviews.review_id WHERE category='${checkedCategory}' GROUP BY reviews.review_id ORDER BY ${sort_by} ${orderCopy}`;
+    const checkedEmptyReviews = await db.query(
+      `SELECT * FROM reviews WHERE category=$1;`,
+      [checkedCategory]
+    );
+    if (checkedEmptyReviews.rows.length === 0) {
+      return [];
+    }
 
+    let queryStr = `SELECT reviews.title, reviews.review_id, reviews.review_img_url, reviews.votes, reviews.owner, reviews.category, reviews.created_at, COUNT(comments.review_id) AS comment_count FROM reviews LEFT JOIN comments ON comments.review_id = reviews.review_id WHERE category='${checkedCategory}' GROUP BY reviews.review_id ORDER BY ${sort_by} ${orderCopy}`;
     const result = await db.query(queryStr);
     return result.rows;
   } else {
@@ -102,21 +98,12 @@ exports.fetchReviews = async (
 };
 
 exports.fetchSpecificReviewComments = async (review_id) => {
-  const checkedDataType = await checkIfNum(review_id);
-  if (!checkedDataType) {
-    return Promise.reject({
-      status: 400,
-      msg: "Invalid Data Type - review_id provided is not an authorised input",
-    });
-  }
-
   const checkedId = await checkReviewIdExists(review_id);
   if (checkedId) {
     const result = await db.query(
       `SELECT comment_id, votes, created_at, author, body FROM comments WHERE review_id=$1;`,
       [review_id]
     );
-
     return result.rows;
   } else {
     return Promise.reject({
@@ -127,11 +114,10 @@ exports.fetchSpecificReviewComments = async (review_id) => {
 };
 
 exports.publishComment = async (review_id, username, body) => {
-  const checkedDataType = await checkIfNum(review_id);
-  if (!checkedDataType) {
+  if (!username || !body) {
     return Promise.reject({
       status: 400,
-      msg: "Invalid Data Type - review_id provided is not an authorised input",
+      msg: "Bad Request - required field (username or body) has not been provided",
     });
   }
 
@@ -150,25 +136,3 @@ exports.publishComment = async (review_id, username, body) => {
 
   return result.rows[0];
 };
-
-// exports.publishReview = async (
-//   owner,
-//   title,
-//   review_body,
-//   designer,
-//   category
-// ) => {
-//   const insertInto = await db.query(
-//     `INSERT INTO reviews (owner, title, review_body, designer, category) VALUES ($1, $2, $3, $4, $5);`,
-//     [owner, title, review_body, designer, category]
-//   );
-
-//   const result = await db.query(
-//     `SELECT * FROM reviews, COUNT(comments.review_id) AS comment_count FROM reviews WHERE review_id = 2 LEFT JOIN comments ON comments.review_id = reviews.review_id`
-//   );
-//   console.log(result.rows);
-
-//   return result.rows[0];
-// };
-
-// [insertInto.rows[0].review_id]

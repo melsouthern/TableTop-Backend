@@ -1,4 +1,3 @@
-// extract any functions you are using to manipulate your data, into this file
 const db = require("../connection");
 
 exports.formatCategoryDataToNested = (categoryData) => {
@@ -51,11 +50,6 @@ exports.checkReviewIdExists = async (review_id) => {
   return result.rows.length !== 0;
 };
 
-exports.checkIfNum = (data) => {
-  const regex = /^\d+$/;
-  return regex.test(data);
-};
-
 exports.checkColumnExists = (sort_by) => {
   return (
     sort_by === "title" ||
@@ -83,9 +77,9 @@ exports.checkCategoryExists = async (category) => {
     return false;
   }
   const checkCategory = category.split("_").join(" ");
-  const result = await db.query(`SELECT reviews.category FROM reviews;`);
+  const result = await db.query(`SELECT categories.slug FROM categories;`);
   const checker = result.rows.filter((row) => {
-    return row.category === checkCategory;
+    return row.slug === checkCategory;
   });
 
   if (checker.length > 0) {

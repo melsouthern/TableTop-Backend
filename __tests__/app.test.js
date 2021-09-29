@@ -23,6 +23,7 @@ describe("GET /api", () => {
 describe("GET /api/categories", () => {
   test("200: responds with an array of category objects which should each have a slug and description", async () => {
     const result = await request(app).get("/api/categories").expect(200);
+    expect(result.body.categories.length).toBe(4);
     result.body.categories.forEach((category) => {
       expect(category).toMatchObject({
         slug: expect.any(String),
@@ -63,7 +64,7 @@ describe("GET /api/reviews/:review_id", () => {
     expect(result.body.msg).toBe("Invalid URL - incorrect path provided");
   });
   test("404: responds with error message if review_id number not found", async () => {
-    const result = await request(app).get("/api/reviews/1000").expect(404);
+    const result = await request(app).get("/api/reviews/990000").expect(404);
     expect(result.body.msg).toBe(
       "Not Found - review_id provided is non-existent"
     );
@@ -73,19 +74,19 @@ describe("GET /api/reviews/:review_id", () => {
       .get("/api/reviews/cats")
       .expect(400);
     expect(stringResult.body.msg).toBe(
-      "Invalid Data Type - review_id provided is not an authorised input"
+      "Invalid Data Type - provided input is not an authorised data type"
     );
     const specialCharResult = await request(app)
       .get("/api/reviews/!@+$")
       .expect(400);
     expect(specialCharResult.body.msg).toBe(
-      "Invalid Data Type - review_id provided is not an authorised input"
+      "Invalid Data Type - provided input is not an authorised data type"
     );
     const numAndStringResult = await request(app)
       .get("/api/reviews/M30w")
       .expect(400);
     expect(numAndStringResult.body.msg).toBe(
-      "Invalid Data Type - review_id provided is not an authorised input"
+      "Invalid Data Type - provided input is not an authorised data type"
     );
   });
 });
@@ -147,37 +148,56 @@ describe("PATCH /api/reviews/:review_id", () => {
       .send({ inc_votes: 3 })
       .expect(400);
     expect(stringResult.body.msg).toBe(
-      "Invalid Data Type - review_id provided is not an authorised input"
+      "Invalid Data Type - provided input is not an authorised data type"
     );
     const specialCharResult = await request(app)
       .patch("/api/reviews/!@+$")
       .send({ inc_votes: 3 })
       .expect(400);
     expect(specialCharResult.body.msg).toBe(
-      "Invalid Data Type - review_id provided is not an authorised input"
+      "Invalid Data Type - provided input is not an authorised data type"
     );
     const numAndStringResult = await request(app)
       .patch("/api/reviews/M30w")
       .send({ inc_votes: 3 })
       .expect(400);
     expect(numAndStringResult.body.msg).toBe(
-      "Invalid Data Type - review_id provided is not an authorised input"
+      "Invalid Data Type - provided input is not an authorised data type"
     );
   });
-  test("400: responds with error message if patch content is provided in wrong format", async () => {
+  test("400: responds with error message if patch content does not include inc_votes", async () => {
     const result = await request(app)
       .patch("/api/reviews/3")
-      .send({ inc_votes: 4, category: "cats" })
+      .send({ category: "cats" })
       .expect(400);
     expect(result.body.msg).toBe(
-      "Bad Request - incorrect format of patch request"
+      "Bad Request - inc_votes has not been provided"
     );
+  });
+  test("200: ignores other keys provided alongside inc_votes", async () => {
+    const result = await request(app)
+      .patch("/api/reviews/3")
+      .send({ inc_votes: 3, category: "strategy" })
+      .expect(200);
+    expect(result.body.review).toEqual({
+      review_id: 3,
+      title: "Ultimate Werewolf",
+      review_body: "We couldn't find the werewolf!",
+      designer: "Akihisa Okui",
+      review_img_url:
+        "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+      votes: 8,
+      category: "social deduction",
+      owner: "bainesface",
+      created_at: "2021-01-18T10:01:41.251Z",
+    });
   });
 });
 
 describe("GET /api/reviews", () => {
   test("200: responds with an array of reviews objects", async () => {
     const result = await request(app).get("/api/reviews").expect(200);
+    expect(result.body.reviews.length).toBe(13);
     result.body.reviews.forEach((review) => {
       expect(review).toMatchObject({
         review_id: expect.any(Number),
@@ -225,10 +245,6 @@ describe("GET /api/reviews", () => {
     expect(categoryResult.body.reviews).toBeSortedBy("category", {
       descending: true,
     });
-    expect(ownerResult.body.reviews.length).toBe(13);
-    expect(titleResult.body.reviews.length).toBe(13);
-    expect(reviewIdResult.body.reviews.length).toBe(13);
-    expect(categoryResult.body.reviews.length).toBe(13);
   });
   test("400: responds with error message when provided sort_by column is not legitimate", async () => {
     const stringResult = await request(app)
@@ -294,6 +310,7 @@ describe("GET /api/reviews", () => {
     const socialResult = await request(app)
       .get("/api/reviews?category=social_deduction")
       .expect(200);
+    expect(socialResult.body.reviews.length).toBe(11);
     socialResult.body.reviews.forEach((review) => {
       expect(review).toMatchObject({
         review_id: expect.any(Number),
@@ -324,18 +341,12 @@ describe("GET /api/reviews", () => {
     });
     expect(euroResult.body.reviews.length).toBe(1);
   });
-  test("400: responds with error message when provided category statement is not legitimate", async () => {
+  test("404: responds with error message when provided category is not found in category query", async () => {
     const stringResult = await request(app)
       .get("/api/reviews?category=cats!")
       .expect(400);
     expect(stringResult.body.msg).toBe(
-      "Bad Request - category statement is provided incorrectly"
-    );
-    const numResult = await request(app)
-      .get("/api/reviews?order=74736763")
-      .expect(400);
-    expect(numResult.body.msg).toBe(
-      "Bad Request - order statement is provided incorrectly"
+      "Not Found - category provided is non-existent"
     );
   });
   test("200: category query, sort_by query and order query work together to provide result", async () => {
@@ -360,6 +371,12 @@ describe("GET /api/reviews", () => {
         comment_count: expect.any(String),
       });
     });
+  });
+  test("200: responds with an empty array of reviews when category is valid but there are no related reviews", async () => {
+    const result = await request(app)
+      .get("/api/reviews?category=children's_games")
+      .expect(200);
+    expect(result.body.reviews).toEqual([]);
   });
 });
 
@@ -417,20 +434,26 @@ describe("GET /api/reviews/:review_id/comments", () => {
       .get("/api/reviews/cats/comments")
       .expect(400);
     expect(stringResult.body.msg).toBe(
-      "Invalid Data Type - review_id provided is not an authorised input"
+      "Invalid Data Type - provided input is not an authorised data type"
     );
     const specialCharResult = await request(app)
       .get("/api/reviews/!@+$/comments")
       .expect(400);
     expect(specialCharResult.body.msg).toBe(
-      "Invalid Data Type - review_id provided is not an authorised input"
+      "Invalid Data Type - provided input is not an authorised data type"
     );
     const numAndStringResult = await request(app)
       .get("/api/reviews/M30w/comments")
       .expect(400);
     expect(numAndStringResult.body.msg).toBe(
-      "Invalid Data Type - review_id provided is not an authorised input"
+      "Invalid Data Type - provided input is not an authorised data type"
     );
+  });
+  test("200: responds with an empty array of comments when review_id is valid but there are no related comments ", async () => {
+    const result = await request(app)
+      .get("/api/reviews/10/comments")
+      .expect(200);
+    expect(result.body.comments).toEqual([]);
   });
 });
 
@@ -484,21 +507,21 @@ describe("POST /api/reviews/:review_id/comments", () => {
       .send({ username: "dav3rid", body: "my cat loves this game!" })
       .expect(400);
     expect(stringResult.body.msg).toBe(
-      "Invalid Data Type - review_id provided is not an authorised input"
+      "Invalid Data Type - provided input is not an authorised data type"
     );
     const specialCharResult = await request(app)
       .post("/api/reviews/!!!/comments")
       .send({ username: "dav3rid", body: "my cat loves this game!" })
       .expect(400);
     expect(specialCharResult.body.msg).toBe(
-      "Invalid Data Type - review_id provided is not an authorised input"
+      "Invalid Data Type - provided input is not an authorised data type"
     );
     const numAndStringResult = await request(app)
       .post("/api/reviews/me3330w/comments")
       .send({ username: "dav3rid", body: "my cat loves this game!" })
       .expect(400);
     expect(numAndStringResult.body.msg).toBe(
-      "Invalid Data Type - review_id provided is not an authorised input"
+      "Invalid Data Type - provided input is not an authorised data type"
     );
   });
   test("404: responds with error message if user provided does not exist", async () => {
@@ -513,14 +536,27 @@ describe("POST /api/reviews/:review_id/comments", () => {
       "Not Found - username provided in post request is non-existent"
     );
   });
-  test("400: responds with error message if post content is provided in wrong format", async () => {
+  test("400: responds with error message if post content does not include username or body", async () => {
     const result = await request(app)
       .post("/api/reviews/2/comments")
-      .send({ user: "dav3rid", bod: "my cat loves this game!" })
+      .send({ username: "cats", category: "pets" })
       .expect(400);
     expect(result.body.msg).toBe(
-      "Bad Request - incorrect format of post request"
+      "Bad Request - required field (username or body) has not been provided"
     );
+  });
+  test("201: ignores other keys provided alongside inc_votes", async () => {
+    const result = await request(app)
+      .post("/api/reviews/2/comments")
+      .send({ username: "dav3rid", category: "pets", body: "wow!" })
+      .expect(201);
+    expect(result.body.comment).toMatchObject({
+      comment_id: expect.any(Number),
+      votes: 0,
+      created_at: expect.any(String),
+      author: "dav3rid",
+      body: "wow!",
+    });
   });
 });
 
@@ -546,19 +582,19 @@ describe("DELETE /api/comments/comment_id", () => {
       .delete("/api/comments/cats")
       .expect(400);
     expect(stringResult.body.msg).toBe(
-      "Invalid Data Type - comment_id provided is not an authorised input"
+      "Invalid Data Type - provided input is not an authorised data type"
     );
     const specialCharResult = await request(app)
       .delete("/api/comments/!&$£")
       .expect(400);
     expect(specialCharResult.body.msg).toBe(
-      "Invalid Data Type - comment_id provided is not an authorised input"
+      "Invalid Data Type - provided input is not an authorised data type"
     );
     const numAndStringResult = await request(app)
       .delete("/api/comments/m30w")
       .expect(400);
     expect(numAndStringResult.body.msg).toBe(
-      "Invalid Data Type - comment_id provided is not an authorised input"
+      "Invalid Data Type - provided input is not an authorised data type"
     );
   });
   test("404: responds with error message if comment_id number not found", async () => {
@@ -572,6 +608,7 @@ describe("DELETE /api/comments/comment_id", () => {
 describe("GET /api/users", () => {
   test("200: responds with an array of objects which should each have a username property", async () => {
     const result = await request(app).get("/api/users").expect(200);
+    expect(result.body.users.length).toBe(4);
     result.body.users.forEach((user) => {
       expect(user).toMatchObject({
         username: expect.any(String),
@@ -661,130 +698,44 @@ describe("PATCH /api/comments/:comment_id", () => {
       .send({ inc_votes: 3 })
       .expect(400);
     expect(stringResult.body.msg).toBe(
-      "Invalid Data Type - comment_id provided is not an authorised input"
+      "Invalid Data Type - provided input is not an authorised data type"
     );
     const specialCharResult = await request(app)
       .patch("/api/comments/!@+$")
       .send({ inc_votes: 3 })
       .expect(400);
     expect(specialCharResult.body.msg).toBe(
-      "Invalid Data Type - comment_id provided is not an authorised input"
+      "Invalid Data Type - provided input is not an authorised data type"
     );
     const numAndStringResult = await request(app)
       .patch("/api/comments/M30w")
       .send({ inc_votes: 3 })
       .expect(400);
     expect(numAndStringResult.body.msg).toBe(
-      "Invalid Data Type - comment_id provided is not an authorised input"
+      "Invalid Data Type - provided input is not an authorised data type"
     );
   });
-  test("400: responds with error message if patch content is provided in wrong format", async () => {
+  test("400: responds with error message if patch content does not include inc_votes", async () => {
     const result = await request(app)
       .patch("/api/comments/3")
-      .send({ inc_votes: 4, category: "cats" })
+      .send({ category: "cats" })
       .expect(400);
     expect(result.body.msg).toBe(
-      "Bad Request - incorrect format of patch request"
+      "Bad Request - inc_votes has not been provided"
     );
   });
-});
-
-describe("POST /api/reviews", () => {
-  test("201: responds with the posted comment", async () => {
+  test("200: ignores other keys provided alongside inc_votes", async () => {
     const result = await request(app)
-      .post("/api/reviews")
-      .send({
-        owner: "dav3rid",
-        title: "Kerplunk; Don't lose your marbles",
-        review_body: "lost my marbles on this game every time",
-        designer: "Avery Wunzboogerz",
-        category: "dexterity",
-      })
-      .expect(201);
-    expect(result.body.review).toMatchObject({
-      owner: "dav3rid",
-      title: "Kerplunk; Don't lose your marbles",
-      review_body: "lost my marbles on this game every time",
-      designer: "Avery Wunzboogerz",
-      category: "dexterity",
-      review_id: expect.any(Number),
-      votes: 0,
-      created_at: expect.any(String),
-      comment_count: 0,
+      .patch("/api/comments/3")
+      .send({ inc_votes: 3, category: "strategy" })
+      .expect(200);
+    expect(result.body.comment).toEqual({
+      comment_id: 3,
+      author: "philippaclaire9",
+      review_id: 3,
+      votes: 13,
+      created_at: "2021-01-18T10:09:48.110Z",
+      body: "I didn't know dogs could play games",
     });
   });
-  // test("404: responds with error message if reviews spelled incorrectly", async () => {
-  //   const result = await request(app)
-  //     .post("/api/revieews/9/comments")
-  //     .send({ username: "dav3rid", body: "my cat loves this game!" })
-  //     .expect(404);
-  //   expect(result.body.msg).toBe("Invalid URL - incorrect path provided");
-  // });
-  // test("404: responds with error message if comments spelled incorrectly", async () => {
-  //   const result = await request(app)
-  //     .post("/api/revieews/9/commeents")
-  //     .send({ username: "dav3rid", body: "my cat loves this game!" })
-  //     .expect(404);
-  //   expect(result.body.msg).toBe("Invalid URL - incorrect path provided");
-  // });
-  // test("404: responds with error message if api spelled incorrectly", async () => {
-  //   const result = await request(app)
-  //     .post("/aip/reviews/9/comments")
-  //     .send({ username: "dav3rid", body: "my cat loves this game!" })
-  //     .expect(404);
-  //   expect(result.body.msg).toBe("Invalid URL - incorrect path provided");
-  // });
-  // test("404: responds with error message if review_id number not found", async () => {
-  //   const result = await request(app)
-  //     .post("/api/reviews/900000/comments")
-  //     .send({ username: "dav3rid", body: "my cat loves this game!" })
-  //     .expect(404);
-  //   expect(result.body.msg).toBe(
-  //     "Not Found - review_id provided is non-existent"
-  //   );
-  // });
-  // test("400: responds with error message if incorrect data type provided as the review_id", async () => {
-  //   const stringResult = await request(app)
-  //     .post("/api/reviews/cats/comments")
-  //     .send({ username: "dav3rid", body: "my cat loves this game!" })
-  //     .expect(400);
-  //   expect(stringResult.body.msg).toBe(
-  //     "Invalid Data Type - review_id provided is not an authorised input"
-  //   );
-  //   const specialCharResult = await request(app)
-  //     .post("/api/reviews/!!!/comments")
-  //     .send({ username: "dav3rid", body: "my cat loves this game!" })
-  //     .expect(400);
-  //   expect(specialCharResult.body.msg).toBe(
-  //     "Invalid Data Type - review_id provided is not an authorised input"
-  //   );
-  //   const numAndStringResult = await request(app)
-  //     .post("/api/reviews/me3330w/comments")
-  //     .send({ username: "dav3rid", body: "my cat loves this game!" })
-  //     .expect(400);
-  //   expect(numAndStringResult.body.msg).toBe(
-  //     "Invalid Data Type - review_id provided is not an authorised input"
-  //   );
-  // });
-  // test("404: responds with error message if user provided does not exist", async () => {
-  //   const result = await request(app)
-  //     .post("/api/reviews/2/comments")
-  //     .send({
-  //       username: "catLady400",
-  //       body: "My 24 cats love to chew on the blocks",
-  //     })
-  //     .expect(404);
-  //   expect(result.body.msg).toBe(
-  //     "Not Found - username provided in post request is non-existent"
-  //   );
-  // });
-  // test("400: responds with error message if post content is provided in wrong format", async () => {
-  //   const result = await request(app)
-  //     .post("/api/reviews/2/comments")
-  //     .send({ user: "dav3rid", bod: "my cat loves this game!" })
-  //     .expect(400);
-  //   expect(result.body.msg).toBe(
-  //     "Bad Request - incorrect format of post request"
-  //   );
-  // });
 });

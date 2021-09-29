@@ -1,18 +1,7 @@
 const db = require("../db/connection");
-const {
-  checkIfNum,
-  checkCommentIdExists,
-} = require("../db/utils/data-manipulation");
+const { checkCommentIdExists } = require("../db/utils/data-manipulation");
 
 exports.removeSpecificComment = async (comment_id) => {
-  const checkedDataType = await checkIfNum(comment_id);
-  if (!checkedDataType) {
-    return Promise.reject({
-      status: 400,
-      msg: "Invalid Data Type - comment_id provided is not an authorised input",
-    });
-  }
-
   const checkedId = await checkCommentIdExists(comment_id);
   if (checkedId) {
     const result = await db.query(
@@ -29,11 +18,10 @@ exports.removeSpecificComment = async (comment_id) => {
 };
 
 exports.tweakSpecificComment = async (comment_id, inc_votes) => {
-  const checkedDataType = await checkIfNum(comment_id);
-  if (!checkedDataType) {
+  if (!inc_votes) {
     return Promise.reject({
       status: 400,
-      msg: "Invalid Data Type - comment_id provided is not an authorised input",
+      msg: "Bad Request - inc_votes has not been provided",
     });
   }
 

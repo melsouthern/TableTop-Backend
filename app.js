@@ -5,6 +5,7 @@ const {
   notAUserError,
   handleServerError,
   customErrors,
+  incorrectDataTypeError,
 } = require("./errors/errors");
 
 app.use(express.json());
@@ -16,6 +17,7 @@ app.all("*", (req, res) => {
 });
 
 app.use(notAUserError);
+app.use(incorrectDataTypeError);
 app.use(customErrors);
 app.use(handleServerError);
 
