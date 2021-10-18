@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const apiRouter = require("./routes/api.router");
 const app = express();
 const {
@@ -7,6 +8,8 @@ const {
   customErrors,
   incorrectDataTypeError,
 } = require("./errors/errors");
+
+app.use(cors());
 
 app.use(express.json());
 
