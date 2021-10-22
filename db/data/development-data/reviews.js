@@ -1,17 +1,5 @@
 module.exports = [
   {
-    title: "Monopoly",
-    designer: "Lizzie Magie & Charles Darrow",
-    owner: "tickle122",
-    review_img_url:
-      "https://www.hasbro.com/common/productimages/en_GB/7EABAF9750569047F5778F4663C79E75/ba295df24c90a91988e41ebf3b6fe84a0a11de88.jpg",
-    review_body:
-      "A game of ups and downs... one minute you feel like the game is about to end, the next, a stroke of luck for another player means you're stuck in an eternal loop where no one ever wins",
-    category: "strategy",
-    created_at: new Date(1610964020514),
-    votes: 1,
-  },
-  {
     title: "JengARRGGGH!",
     designer: "Leslie Scott",
     owner: "grumpy19",
