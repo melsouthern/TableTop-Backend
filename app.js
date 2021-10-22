@@ -8,7 +8,6 @@ const {
   customErrors,
   incorrectDataTypeError,
 } = require("./errors/errors");
-t;
 
 app.use(cors());
 
